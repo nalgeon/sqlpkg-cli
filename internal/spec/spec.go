@@ -1,11 +1,12 @@
-// Package metadata manages the package metadata (the sqlpkg.json file).
-package metadata
+// Package spec manages the package spec file (sqlpkg.json).
+package spec
 
 import (
 	"errors"
 	"fmt"
-	"net/url"
 	"regexp"
+
+	"github.com/nalgeon/sqlpkg-cli/internal/httpx"
 )
 
 // e.g. github.com/nalgeon/sqlean
@@ -14,7 +15,7 @@ var reGithub = regexp.MustCompile(`^github.com/[\w\-_.]+/[\w\-_.]+$`)
 // e.g. nalgeon/sqlean
 var reOwnerName = regexp.MustCompile(`^[\w\-_.]+/[\w\-_.]+$`)
 
-// Read retrieves package metadata from the specified path.
+// Read retrieves package spec file from the specified path.
 // Path can be one of the following:
 //   - owner-name pair: nalgeon/sqlean
 //   - github repo: github.com/nalgeon/sqlean
@@ -36,7 +37,7 @@ func Read(path string) (pkg *Package, err error) {
 	return pkg, errors.Join(errs...)
 }
 
-// expandPath generates possible paths to the package metadata file.
+// expandPath generates possible paths to the package spec file.
 func expandPath(path string) []string {
 	if reGithub.MatchString(path) {
 		// try reading from the main branch of the github repository
@@ -57,21 +58,9 @@ func expandPath(path string) []string {
 // inferReader returns a proper reader function for a path,
 // which can be a local file path or a remote url path.
 func inferReader(path string) ReadFunc {
-	if isURL(path) {
+	if httpx.IsURL(path) {
 		return ReadRemote
 	} else {
 		return ReadLocal
 	}
-}
-
-// isURL checks if the path is an url.
-func isURL(path string) bool {
-	u, err := url.Parse(path)
-	if err != nil {
-		return false
-	}
-	if u.Scheme == "" {
-		return false
-	}
-	return true
 }

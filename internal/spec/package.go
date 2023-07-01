@@ -1,4 +1,4 @@
-package metadata
+package spec
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ import (
 // DirName is the name of the folder with packages
 const DirName = ".sqlpkg"
 
-// FileName is the package metadata filename.
+// FileName is the package spec filename.
 const FileName = "sqlpkg.json"
 
 // downloadBase determines default asset url for known providers.
@@ -54,7 +54,7 @@ func (p *AssetPath) MarshalText() ([]byte, error) {
 
 func (p *AssetPath) UnmarshalText(text []byte) error {
 	p.Value = string(text)
-	p.IsRemote = isURL(p.Value) || strings.HasPrefix(p.Value, "{repository}")
+	p.IsRemote = httpx.IsURL(p.Value) || strings.HasPrefix(p.Value, "{repository}")
 	return nil
 }
 
@@ -62,7 +62,7 @@ func (p *AssetPath) String() string {
 	return p.Value
 }
 
-// A Package describes the package metadata.
+// A Package describes the package spec.
 type Package struct {
 	Owner       string   `json:"owner"`
 	Name        string   `json:"name"`
@@ -124,7 +124,7 @@ func (p *Package) AssetPath(os, arch string) (*AssetPath, error) {
 
 }
 
-// Save writes the package metadata file to the specified directory.
+// Save writes the package spec file to the specified directory.
 func (p *Package) Save(dir string) error {
 	data, err := json.MarshalIndent(p, "", "    ")
 	if err != nil {
@@ -139,15 +139,15 @@ func Dir(basePath, owner, name string) string {
 	return filepath.Join(basePath, DirName, owner, name)
 }
 
-// Path returns the path to the package metadata file.
+// Path returns the path to the package spec file.
 func Path(basePath, owner, name string) string {
 	return filepath.Join(basePath, DirName, owner, name, FileName)
 }
 
-// A ReadFunc if a function that reads package metadata from a given path.
+// A ReadFunc if a function that reads package spec from a given path.
 type ReadFunc func(path string) (*Package, error)
 
-// ReadLocal reads package metadata from a local file.
+// ReadLocal reads package spec from a local file.
 func ReadLocal(path string) (*Package, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -161,7 +161,7 @@ func ReadLocal(path string) (*Package, error) {
 	return &pkg, nil
 }
 
-// ReadRemote reads package metadata from a remote url.
+// ReadRemote reads package spec from a remote url.
 func ReadRemote(url string) (*Package, error) {
 	var pkg Package
 	err := httpx.GetJSON(url, &pkg)

@@ -16,7 +16,7 @@ func Info(args []string) error {
 	path := args[0]
 
 	cmd := new(command)
-	cmd.readMetadata(path)
+	cmd.readSpec(path)
 	if cmd.err != nil {
 		return errors.New("package not found")
 	}

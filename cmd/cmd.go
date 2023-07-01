@@ -10,7 +10,7 @@ import (
 
 	"github.com/nalgeon/sqlpkg-cli/internal/assets"
 	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
-	"github.com/nalgeon/sqlpkg-cli/internal/metadata"
+	"github.com/nalgeon/sqlpkg-cli/internal/spec"
 	"golang.org/x/mod/semver"
 )
 
@@ -23,7 +23,7 @@ var userHomeDir string
 // init determines the working directory.
 // It is either the .sqlpkg directory (if present) or ~/.sqlpkg otherwise.
 func init() {
-	if fileio.Exists(metadata.DirName) {
+	if fileio.Exists(spec.DirName) {
 		workDir = "."
 		return
 	}
@@ -37,31 +37,31 @@ func init() {
 }
 
 type command struct {
-	pkg *metadata.Package
+	pkg *spec.Package
 	dir string
 	err error
 }
 
-// readMetadata reads package metadata.
-func (cmd *command) readMetadata(path string) {
+// readSpec reads package spec.
+func (cmd *command) readSpec(path string) {
 	if cmd.err != nil {
 		return
 	}
 
 	var err error
-	cmd.pkg, err = metadata.Read(path)
+	cmd.pkg, err = spec.Read(path)
 	if err != nil {
-		cmd.err = fmt.Errorf("failed to read package metadata: %w", err)
+		cmd.err = fmt.Errorf("failed to read package spec: %w", err)
 		return
 	}
 	cmd.pkg.ExpandVars()
-	debug("found package metadata at %s", cmd.pkg.Path)
+	debug("found package spec at %s", cmd.pkg.Path)
 	debug("read package %s, version = %s", cmd.pkg.FullName(), cmd.pkg.Version)
 }
 
 // isInstalled checks if there is a local package installed.
 func (cmd *command) isInstalled() bool {
-	path := metadata.Path(workDir, cmd.pkg.Owner, cmd.pkg.Name)
+	path := spec.Path(workDir, cmd.pkg.Owner, cmd.pkg.Name)
 	return fileio.Exists(path)
 }
 
@@ -71,12 +71,12 @@ func (cmd *command) hasNewVersion() bool {
 		return true
 	}
 
-	oldPath := metadata.Path(workDir, cmd.pkg.Owner, cmd.pkg.Name)
+	oldPath := spec.Path(workDir, cmd.pkg.Owner, cmd.pkg.Name)
 	if !fileio.Exists(oldPath) {
 		return true
 	}
 
-	oldPkg, err := metadata.ReadLocal(oldPath)
+	oldPkg, err := spec.ReadLocal(oldPath)
 	if err != nil {
 		cmd.err = err
 		return true
@@ -100,7 +100,7 @@ func (cmd *command) hasNewVersion() bool {
 }
 
 // buildAssetPath constructs an URL to download package asset.
-func (cmd *command) buildAssetPath() *metadata.AssetPath {
+func (cmd *command) buildAssetPath() *spec.AssetPath {
 	if cmd.err != nil {
 		return nil
 	}
@@ -123,13 +123,13 @@ func (cmd *command) buildAssetPath() *metadata.AssetPath {
 }
 
 // downloadAsset downloads package asset.
-func (cmd *command) downloadAsset(assetPath *metadata.AssetPath) *assets.Asset {
+func (cmd *command) downloadAsset(assetPath *spec.AssetPath) *assets.Asset {
 	if cmd.err != nil {
 		return nil
 	}
 
 	debug("downloading %s", assetPath)
-	cmd.dir = metadata.Dir(os.TempDir(), cmd.pkg.Owner, cmd.pkg.Name)
+	cmd.dir = spec.Dir(os.TempDir(), cmd.pkg.Owner, cmd.pkg.Name)
 	err := fileio.CreateDir(cmd.dir)
 	if err != nil {
 		cmd.err = fmt.Errorf("failed to create temp directory: %w", err)
@@ -181,7 +181,7 @@ func (cmd *command) installFiles() {
 		return
 	}
 
-	pkgDir := metadata.Dir(workDir, cmd.pkg.Owner, cmd.pkg.Name)
+	pkgDir := spec.Dir(workDir, cmd.pkg.Owner, cmd.pkg.Name)
 	err := fileio.MoveDir(cmd.dir, pkgDir)
 	if err != nil {
 		cmd.err = fmt.Errorf("failed to copy downloaded files: %w", err)
@@ -190,7 +190,7 @@ func (cmd *command) installFiles() {
 
 	err = cmd.pkg.Save(pkgDir)
 	if err != nil {
-		cmd.err = fmt.Errorf("failed to write package metadata: %w", err)
+		cmd.err = fmt.Errorf("failed to write package spec: %w", err)
 		return
 	}
 
@@ -203,7 +203,7 @@ func getDirByFullName(fullName string) (string, error) {
 	if len(parts) != 2 {
 		return "", errors.New("invalid package name")
 	}
-	path := metadata.Dir(workDir, parts[0], parts[1])
+	path := spec.Dir(workDir, parts[0], parts[1])
 	return path, nil
 }
 
@@ -213,7 +213,7 @@ func getPathByFullName(fullName string) (string, error) {
 	if len(parts) != 2 {
 		return "", errors.New("invalid package name")
 	}
-	path := metadata.Path(workDir, parts[0], parts[1])
+	path := spec.Path(workDir, parts[0], parts[1])
 	return path, nil
 }
 

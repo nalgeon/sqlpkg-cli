@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
-	"github.com/nalgeon/sqlpkg-cli/internal/metadata"
+	"github.com/nalgeon/sqlpkg-cli/internal/spec"
 )
 
 const initHelp = "usage: sqlpkg init"
@@ -17,11 +17,11 @@ func Init(args []string) error {
 		return errors.New(initHelp)
 	}
 
-	if fileio.Exists(metadata.DirName) {
+	if fileio.Exists(spec.DirName) {
 		return errors.New(".sqlpkg dir already exists")
 	}
 
-	err := os.Mkdir(metadata.DirName, 0755)
+	err := os.Mkdir(spec.DirName, 0755)
 	if err != nil {
 		return fmt.Errorf("failed to create a local repository: %w", err)
 	}

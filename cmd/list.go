@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"text/tabwriter"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/metadata"
+	"github.com/nalgeon/sqlpkg-cli/internal/spec"
 )
 
 const listHelp = "usage: sqlpkg list"
@@ -18,7 +18,7 @@ func List(args []string) error {
 		return errors.New(listHelp)
 	}
 
-	pattern := fmt.Sprintf("%s/%s/*/*/%s", workDir, metadata.DirName, metadata.FileName)
+	pattern := fmt.Sprintf("%s/%s/*/*/%s", workDir, spec.DirName, spec.FileName)
 	paths, _ := filepath.Glob(pattern)
 
 	if len(paths) == 0 {
@@ -32,7 +32,7 @@ func List(args []string) error {
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 4, 0, ' ', 0)
 	for _, path := range paths {
-		pkg, err := metadata.ReadLocal(path)
+		pkg, err := spec.ReadLocal(path)
 		if err != nil {
 			return fmt.Errorf("invalid package spec: %s", path)
 		}

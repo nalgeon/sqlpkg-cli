@@ -16,7 +16,7 @@ func Install(args []string) error {
 	log("> installing %s...", path)
 
 	cmd := new(command)
-	cmd.readMetadata(path)
+	cmd.readSpec(path)
 	if !cmd.hasNewVersion() {
 		log("✓ already at the latest version")
 		return nil

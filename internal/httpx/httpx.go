@@ -6,10 +6,23 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"time"
 )
 
 var client = http.Client{Timeout: 3 * time.Second}
+
+// IsURL checks if the path is an url.
+func IsURL(path string) bool {
+	u, err := url.Parse(path)
+	if err != nil {
+		return false
+	}
+	if u.Scheme == "" {
+		return false
+	}
+	return true
+}
 
 // Exists checks if the specified url exists.
 func Exists(url string) bool {

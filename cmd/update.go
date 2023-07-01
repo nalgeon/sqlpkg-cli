@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/metadata"
+	"github.com/nalgeon/sqlpkg-cli/internal/spec"
 )
 
 const updateHelp = "usage: sqlpkg update [package]"
@@ -16,7 +16,7 @@ func UpdateAll(args []string) error {
 		return errors.New(updateHelp)
 	}
 
-	pattern := fmt.Sprintf("%s/%s/*/*/%s", workDir, metadata.DirName, metadata.FileName)
+	pattern := fmt.Sprintf("%s/%s/*/*/%s", workDir, spec.DirName, spec.FileName)
 	paths, _ := filepath.Glob(pattern)
 
 	if len(paths) == 0 {
@@ -26,7 +26,7 @@ func UpdateAll(args []string) error {
 
 	count := 0
 	for _, path := range paths {
-		pkg, err := metadata.ReadLocal(path)
+		pkg, err := spec.ReadLocal(path)
 		if err != nil {
 			log("! invalid package %s: %s", path, err)
 			continue
@@ -62,7 +62,7 @@ func Update(args []string) error {
 		return err
 	}
 
-	pkg, err := metadata.ReadLocal(path)
+	pkg, err := spec.ReadLocal(path)
 	if err != nil {
 		return fmt.Errorf("invalid package: %w", err)
 	}
@@ -84,9 +84,9 @@ func Update(args []string) error {
 // updatePackage updates a package.
 // Returns true if the package was actually updated, false otherwise
 // (already at the latest version or encountered an error).
-func updatePackage(pkg *metadata.Package) (bool, error) {
+func updatePackage(pkg *spec.Package) (bool, error) {
 	cmd := new(command)
-	cmd.readMetadata(pkg.FullName())
+	cmd.readSpec(pkg.FullName())
 	if !cmd.hasNewVersion() {
 		return false, nil
 	}
