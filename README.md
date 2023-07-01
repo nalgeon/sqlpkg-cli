@@ -8,11 +8,17 @@ Please note that `sqlpkg` is new and a bit rough around the edges.
 
 ## Downloading and installing
 
-`sqlpkg` is a binary executable file (`sqlpkg.exe` on Windows, `sqlpkg` on Linux/macOS). Download it from the link below and put it somewhere in your `PATH` ([what's that?](https://stackoverflow.com/a/41895179/19962064)), so you can run it from anyhwere on your computer.
+`sqlpkg` is a binary executable file (`sqlpkg.exe` on Windows, `sqlpkg` on Linux/macOS). Download it from the link below, unpack and put somewhere in your `PATH` ([what's that?](https://gist.github.com/nex3/c395b2f8fd4b02068be37c961301caa7)), so you can run it from anyhwere on your computer.
 
 [**Download**](https://github.com/nalgeon/sqlpkg-cli/releases/latest)
 
 Then run it from the command line (terminal) as described below.
+
+**Note for macOS users**. macOS disables unsigned binaries and prevents the `sqlpkg` from running. To resolve this issue, remove the build from quarantine by running the following command in Terminal (replace `/path/to/folder` with an actual path to the folder containing the `sqlpkg` binary):
+
+```
+xattr -d com.apple.quarantine /path/to/folder/sqlpkg
+```
 
 ## Installing packages
 
@@ -49,7 +55,7 @@ By default, `sqlpkg` installs all extensions in the home folder:
 -   `%USERPROFILE%\.sqlpkg` on Windows
 -   `~/.sqlpkg` on Linux/macOS
 
-So for our `nalgeon/stats` extension it might be:
+For example, given the user `anton` and the package `nalgeon/stats`, the location will be:
 
 -   `C:\Users\anton\.sqlpkg\nalgeon\stats\stats.dll` on Windows
 -   `/home/anton/.sqlpkg/nalgeon/stats/stats.so` on Linux
@@ -93,7 +99,7 @@ Uninstalls a previously installed package.
 
 ## Using a local repository
 
-By default, `sqlpkg` installs all extensions in the home folder. If you are writing a Python (JavaScript, Go, ...) application — you may prefer to put them in the project folder (think virtual environment in Python or `node_modules` in JavaScript).
+By default, `sqlpkg` installs all extensions in the home folder. If you are writing a Python (JavaScript, Go, ...) application — you may prefer to put them in the project folder (like virtual environment in Python or `node_modules` in JavaScript).
 
 To do that, run the `init` command:
 
