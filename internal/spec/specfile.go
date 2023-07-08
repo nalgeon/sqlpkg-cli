@@ -69,14 +69,13 @@ type Package struct {
 	Version     string   `json:"version"`
 	Homepage    string   `json:"homepage"`
 	Repository  string   `json:"repository"`
+	Specfile    string   `json:"specfile"`
 	Authors     []string `json:"authors"`
 	License     string   `json:"license"`
 	Description string   `json:"description"`
 	Keywords    []string `json:"keywords"`
 	Symbols     []string `json:"symbols"`
 	Assets      `json:"assets"`
-
-	Path string `json:"-"`
 }
 
 // Assets are archives of package files, each for a specific platform.

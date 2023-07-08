@@ -55,7 +55,7 @@ func (cmd *command) readSpec(path string) {
 		return
 	}
 	cmd.pkg.ExpandVars()
-	debug("found package spec at %s", cmd.pkg.Path)
+	debug("found package spec at %s", cmd.pkg.Specfile)
 	debug("read package %s, version = %s", cmd.pkg.FullName(), cmd.pkg.Version)
 }
 

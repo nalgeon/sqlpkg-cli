@@ -29,7 +29,7 @@ func Read(path string) (pkg *Package, err error) {
 		readFunc := inferReader(path)
 		pkg, err = readFunc(path)
 		if err == nil {
-			pkg.Path = path
+			pkg.Specfile = path
 			return pkg, nil
 		} else {
 			errs = append(errs, fmt.Errorf("%s: %w", path, err))
