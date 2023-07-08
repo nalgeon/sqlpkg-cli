@@ -3,6 +3,7 @@ package fileio
 
 import (
 	"crypto/sha256"
+	"encoding/json"
 	"io"
 	"os"
 )
@@ -47,6 +48,20 @@ func CopyFile(src, dst string) (int, error) {
 	}
 	err = os.WriteFile(dst, data, 0644)
 	return len(data), err
+}
+
+// ReadJSON reads JSON from a local file.
+func ReadJSON[T any](path string) (*T, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	var val T
+	err = json.Unmarshal(data, &val)
+	if err != nil {
+		return nil, err
+	}
+	return &val, nil
 }
 
 // Exists checks if the specified path exists.

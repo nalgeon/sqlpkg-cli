@@ -144,33 +144,6 @@ func Path(basePath, owner, name string) string {
 	return filepath.Join(basePath, DirName, owner, name, FileName)
 }
 
-// A ReadFunc if a function that reads package spec from a given path.
-type ReadFunc func(path string) (*Package, error)
-
-// ReadLocal reads package spec from a local file.
-func ReadLocal(path string) (*Package, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	var pkg Package
-	err = json.Unmarshal(data, &pkg)
-	if err != nil {
-		return nil, err
-	}
-	return &pkg, nil
-}
-
-// ReadRemote reads package spec from a remote url.
-func ReadRemote(url string) (*Package, error) {
-	var pkg Package
-	err := httpx.GetJSON(url, &pkg)
-	if err != nil {
-		return nil, err
-	}
-	return &pkg, nil
-}
-
 // inferAssetUrl determines an asset url given the package repository url.
 func inferAssetUrl(repoUrl string) string {
 	url, err := url.Parse(repoUrl)

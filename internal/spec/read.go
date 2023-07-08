@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
 	"github.com/nalgeon/sqlpkg-cli/internal/httpx"
 )
 
@@ -54,6 +55,19 @@ func expandPath(path string) []string {
 	}
 	return []string{path}
 }
+
+// ReadLocal reads package spec from a local file.
+func ReadLocal(path string) (pkg *Package, err error) {
+	return fileio.ReadJSON[Package](path)
+}
+
+// ReadRemote reads package spec from a remote url.
+func ReadRemote(path string) (pkg *Package, err error) {
+	return httpx.GetJSON[Package](path)
+}
+
+// A ReadFunc if a function that reads package spec from a given path.
+type ReadFunc func(path string) (*Package, error)
 
 // inferReader returns a proper reader function for a path,
 // which can be a local file path or a remote url path.

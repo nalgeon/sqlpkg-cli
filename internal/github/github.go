@@ -14,8 +14,7 @@ type Release struct {
 
 func GetLatestVersion(owner, repo string) (string, error) {
 	url := fmt.Sprintf("%s/repos/%s/%s/releases/latest", base_url, owner, repo)
-	var rel Release
-	err := httpx.GetJSON(url, &rel)
+	rel, err := httpx.GetJSON[Release](url)
 	if err != nil {
 		return "", err
 	}
