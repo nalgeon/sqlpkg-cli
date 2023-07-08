@@ -2,10 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
-	"os"
-
-	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
 )
 
 const uninstallHelp = "usage: sqlpkg uninstall package"
@@ -17,21 +13,21 @@ func Uninstall(args []string) error {
 	}
 
 	fullName := args[0]
-	dir, err := getDirByFullName(fullName)
+	log("> uninstalling %s...", fullName)
+
+	err := removePackageDir(fullName)
 	if err != nil {
 		return err
 	}
 
-	log("> uninstalling %s...", fullName)
-	debug("checking dir: %s", dir)
-	if !fileio.Exists(dir) {
-		return errors.New("package is not installed")
+	lck, err := readLockfile()
+	if err != nil {
+		return err
 	}
 
-	debug("deleting dir: %s", dir)
-	err = os.RemoveAll(dir)
+	err = removeFromLockfile(lck, fullName)
 	if err != nil {
-		return fmt.Errorf("uninstall failed: %w", err)
+		return err
 	}
 
 	log("✓ uninstalled package %s", fullName)

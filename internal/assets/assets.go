@@ -20,8 +20,13 @@ import (
 // An Asset is an archive of package files for a specific platform.
 type Asset struct {
 	Name     string
+	Path     string
 	Size     int64
 	Checksum []byte
+}
+
+func (a *Asset) Dir() string {
+	return filepath.Dir(a.Path)
 }
 
 // Validate compares the asset checksum against the provided checksum string.
@@ -68,7 +73,7 @@ func Download(dir, rawURL string) (asset *Asset, err error) {
 		return nil, err
 	}
 
-	return &Asset{name, size, checksum}, nil
+	return &Asset{name, path, size, checksum}, nil
 }
 
 // Copy copies an asset from the local path to the local dir.
@@ -86,7 +91,7 @@ func Copy(dir, path string) (asset *Asset, err error) {
 		return nil, err
 	}
 
-	return &Asset{name, int64(size), checksum}, nil
+	return &Asset{name, dstPath, int64(size), checksum}, nil
 }
 
 // Unpack unpacks an asset from the given path to the same dir

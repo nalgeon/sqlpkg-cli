@@ -28,8 +28,24 @@ func NewLockfile() *Lockfile {
 	return &Lockfile{packages}
 }
 
+// Has checks if a package is in the lockfile.
+func (lck *Lockfile) Has(fullName string) bool {
+	_, ok := lck.Packages[fullName]
+	return ok
+}
+
+// Range iterates over packages from the lockfile.
+func (lck *Lockfile) Range(fn func(fullName string, pkg *spec.Package) bool) {
+	for fullName, pkg := range lck.Packages {
+		ok := fn(fullName, pkg)
+		if !ok {
+			break
+		}
+	}
+}
+
 // Add adds a package to the lockfile.
-func (lf *Lockfile) Add(pkg *spec.Package) {
+func (lck *Lockfile) Add(pkg *spec.Package) {
 	p := spec.Package{
 		Owner:    pkg.Owner,
 		Name:     pkg.Name,
@@ -37,17 +53,17 @@ func (lf *Lockfile) Add(pkg *spec.Package) {
 		Specfile: pkg.Specfile,
 		Assets:   pkg.Assets,
 	}
-	lf.Packages[pkg.FullName()] = &p
+	lck.Packages[pkg.FullName()] = &p
 }
 
 // Remove removes a package from the lockfile.
-func (lf *Lockfile) Remove(pkg *spec.Package) {
-	delete(lf.Packages, pkg.FullName())
+func (lck *Lockfile) Remove(pkg *spec.Package) {
+	delete(lck.Packages, pkg.FullName())
 }
 
 // Save writes the lockfile to the specified directory.
-func (lf *Lockfile) Save(dir string) error {
-	data, err := json.MarshalIndent(lf, "", "    ")
+func (lck *Lockfile) Save(dir string) error {
+	data, err := json.MarshalIndent(lck, "", "    ")
 	if err != nil {
 		return err
 	}

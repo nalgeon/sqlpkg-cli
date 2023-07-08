@@ -4,12 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"runtime"
 	"strings"
 
 	"github.com/nalgeon/sqlpkg-cli/internal/assets"
 	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
+	"github.com/nalgeon/sqlpkg-cli/internal/lockfile"
 	"github.com/nalgeon/sqlpkg-cli/internal/spec"
 	"golang.org/x/mod/semver"
 )
@@ -36,49 +36,33 @@ func init() {
 	workDir = userHomeDir
 }
 
-type command struct {
-	pkg *spec.Package
-	dir string
-	err error
-}
-
 // readSpec reads package spec.
-func (cmd *command) readSpec(path string) {
-	if cmd.err != nil {
-		return
-	}
-
-	var err error
-	cmd.pkg, err = spec.Read(path)
+func readSpec(path string) (*spec.Package, error) {
+	pkg, err := spec.Read(path)
 	if err != nil {
-		cmd.err = fmt.Errorf("failed to read package spec: %w", err)
-		return
+		return nil, fmt.Errorf("failed to read package spec: %w", err)
 	}
-	cmd.pkg.ExpandVars()
-	debug("found package spec at %s", cmd.pkg.Specfile)
-	debug("read package %s, version = %s", cmd.pkg.FullName(), cmd.pkg.Version)
+	pkg.ExpandVars()
+	debug("found package spec at %s", pkg.Specfile)
+	debug("read package %s, version = %s", pkg.FullName(), pkg.Version)
+	return pkg, nil
 }
 
 // isInstalled checks if there is a local package installed.
-func (cmd *command) isInstalled() bool {
-	path := spec.Path(workDir, cmd.pkg.Owner, cmd.pkg.Name)
+func isInstalled(pkg *spec.Package) bool {
+	path := spec.Path(workDir, pkg.Owner, pkg.Name)
 	return fileio.Exists(path)
 }
 
 // hasNewVersion checks if the remote package is newer than the local one.
-func (cmd *command) hasNewVersion() bool {
-	if cmd.err != nil {
-		return true
-	}
-
-	oldPath := spec.Path(workDir, cmd.pkg.Owner, cmd.pkg.Name)
+func hasNewVersion(pkg *spec.Package) bool {
+	oldPath := spec.Path(workDir, pkg.Owner, pkg.Name)
 	if !fileio.Exists(oldPath) {
 		return true
 	}
 
 	oldPkg, err := spec.ReadLocal(oldPath)
 	if err != nil {
-		cmd.err = err
 		return true
 	}
 	debug("local package version = %s", oldPkg.Version)
@@ -88,11 +72,11 @@ func (cmd *command) hasNewVersion() bool {
 		return true
 	}
 
-	if oldPkg.Version == cmd.pkg.Version {
+	if oldPkg.Version == pkg.Version {
 		return false
 	}
 
-	if semver.Compare(oldPkg.Version, cmd.pkg.Version) < 0 {
+	if semver.Compare(oldPkg.Version, pkg.Version) < 0 {
 		return false
 	}
 
@@ -100,128 +84,168 @@ func (cmd *command) hasNewVersion() bool {
 }
 
 // buildAssetPath constructs an URL to download package asset.
-func (cmd *command) buildAssetPath() *spec.AssetPath {
-	if cmd.err != nil {
-		return nil
-	}
+func buildAssetPath(pkg *spec.Package) (*spec.AssetPath, error) {
 	debug("checking remote asset for platform %s-%s", runtime.GOOS, runtime.GOARCH)
-	debug("asset base path = %s", cmd.pkg.Assets.Path)
+	debug("asset base path = %s", pkg.Assets.Path)
 
-	var err error
-	assetPath, err := cmd.pkg.AssetPath(runtime.GOOS, runtime.GOARCH)
+	assetPath, err := pkg.AssetPath(runtime.GOOS, runtime.GOARCH)
 	if err != nil {
-		cmd.err = fmt.Errorf("unsupported platform: %s-%s", runtime.GOOS, runtime.GOARCH)
-		return nil
+		return nil, fmt.Errorf("unsupported platform: %s-%s", runtime.GOOS, runtime.GOARCH)
 	}
 
 	if !assetPath.Exists() {
-		cmd.err = fmt.Errorf("asset does not exist: %s", assetPath)
-		return nil
+		return nil, fmt.Errorf("asset does not exist: %s", assetPath)
 	}
 
-	return assetPath
+	return assetPath, nil
 }
 
 // downloadAsset downloads package asset.
-func (cmd *command) downloadAsset(assetPath *spec.AssetPath) *assets.Asset {
-	if cmd.err != nil {
-		return nil
-	}
-
+func downloadAsset(pkg *spec.Package, assetPath *spec.AssetPath) (*assets.Asset, error) {
 	debug("downloading %s", assetPath)
-	cmd.dir = spec.Dir(os.TempDir(), cmd.pkg.Owner, cmd.pkg.Name)
-	err := fileio.CreateDir(cmd.dir)
+	dir := spec.Dir(os.TempDir(), pkg.Owner, pkg.Name)
+	err := fileio.CreateDir(dir)
 	if err != nil {
-		cmd.err = fmt.Errorf("failed to create temp directory: %w", err)
-		return nil
+		return nil, fmt.Errorf("failed to create temp directory: %w", err)
 	}
 
 	var asset *assets.Asset
 	if assetPath.IsRemote {
-		asset, err = assets.Download(cmd.dir, assetPath.Value)
+		asset, err = assets.Download(dir, assetPath.Value)
 	} else {
-		asset, err = assets.Copy(cmd.dir, assetPath.Value)
+		asset, err = assets.Copy(dir, assetPath.Value)
 	}
 	if err != nil {
-		cmd.err = fmt.Errorf("failed to download asset: %w", err)
-		return nil
+		return nil, fmt.Errorf("failed to download asset: %w", err)
 	}
 
 	sizeKb := float64(asset.Size) / 1024
 	debug("downloaded %s (%.2f Kb)", asset.Name, sizeKb)
-	return asset
+	return asset, nil
 }
 
 // validateAsset checks if the asset is valid.
-func (cmd *command) validateAsset(asset *assets.Asset) bool {
-	if cmd.err != nil {
-		return false
-	}
-
-	checksumStr, ok := cmd.pkg.Checksums[asset.Name]
+func validateAsset(pkg *spec.Package, asset *assets.Asset) error {
+	checksumStr, ok := pkg.Checksums[asset.Name]
 	if !ok {
 		debug("spec is missing asset checksum")
-		return true
+		return nil
 	}
 
 	ok, err := asset.Validate(checksumStr)
 	if err != nil {
-		cmd.err = fmt.Errorf("failed to validate asset: %w", err)
-		return false
+		return fmt.Errorf("failed to validate asset: %w", err)
 	}
 
 	if !ok {
-		cmd.err = fmt.Errorf("asset checksum is invalid")
-		return false
+		return fmt.Errorf("asset checksum is invalid")
 	}
 
 	debug("asset checksum is valid")
-	return ok
+	return nil
 }
 
 // unpackAsset unpacks package asset.
-func (cmd *command) unpackAsset(asset *assets.Asset) {
-	if cmd.err != nil {
-		return
-	}
-
-	assetPath := filepath.Join(cmd.dir, asset.Name)
-	nFiles, err := assets.Unpack(assetPath, cmd.pkg.Assets.Pattern)
+func unpackAsset(pkg *spec.Package, asset *assets.Asset) error {
+	nFiles, err := assets.Unpack(asset.Path, pkg.Assets.Pattern)
 	if err != nil {
-		cmd.err = fmt.Errorf("failed to unpack asset: %w", err)
-		return
+		return fmt.Errorf("failed to unpack asset: %w", err)
 	}
 	if nFiles == 0 {
 		debug("not an archive, skipping unpack: %s", asset.Name)
-		return
+		return nil
 	}
-	err = os.Remove(assetPath)
+	err = os.Remove(asset.Path)
 	if err != nil {
-		cmd.err = fmt.Errorf("failed to delete asset after unpacking: %w", err)
+		return fmt.Errorf("failed to delete asset after unpacking: %w", err)
 	}
 	debug("unpacked %d files from %s", nFiles, asset.Name)
+	return nil
 }
 
 // installFiles installes unpacked package files.
-func (cmd *command) installFiles() {
-	if cmd.err != nil {
-		return
-	}
-
-	pkgDir := spec.Dir(workDir, cmd.pkg.Owner, cmd.pkg.Name)
-	err := fileio.MoveDir(cmd.dir, pkgDir)
+func installFiles(pkg *spec.Package, asset *assets.Asset) error {
+	pkgDir := spec.Dir(workDir, pkg.Owner, pkg.Name)
+	err := fileio.MoveDir(asset.Dir(), pkgDir)
 	if err != nil {
-		cmd.err = fmt.Errorf("failed to copy downloaded files: %w", err)
-		return
+		return fmt.Errorf("failed to copy downloaded files: %w", err)
 	}
 
-	err = cmd.pkg.Save(pkgDir)
+	err = pkg.Save(pkgDir)
 	if err != nil {
-		cmd.err = fmt.Errorf("failed to write package spec: %w", err)
-		return
+		return fmt.Errorf("failed to write package spec: %w", err)
 	}
 
-	cmd.dir = pkgDir
+	return nil
+}
+
+// readLockfile reads lockfile from the work directory.
+func readLockfile() (*lockfile.Lockfile, error) {
+	path := lockfile.Path(workDir)
+	if !fileio.Exists(path) {
+		debug("created new lockfile")
+		return lockfile.NewLockfile(), nil
+	}
+
+	lck, err := lockfile.ReadLocal(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read lockfile: %w", err)
+	}
+
+	debug("read existing lockfile")
+	return lck, nil
+}
+
+// addToLockfile adds package to the lockfile.
+func addToLockfile(lck *lockfile.Lockfile, pkg *spec.Package) error {
+	lck.Add(pkg)
+	err := lck.Save(workDir)
+	if err != nil {
+		return fmt.Errorf("failed to save lockfile: %w", err)
+	}
+
+	debug("added package to the lockfile")
+	return nil
+}
+
+// removeFromLockfile removes package from the lockfile.
+func removeFromLockfile(lck *lockfile.Lockfile, fullName string) error {
+	pkg, ok := lck.Packages[fullName]
+	if !ok {
+		debug("package not listed in the lockfile")
+		return nil
+	}
+
+	lck.Remove(pkg)
+	err := lck.Save(workDir)
+	if err != nil {
+		return fmt.Errorf("failed to save lockfile: %w", err)
+	}
+
+	debug("removed package from the lockfile")
+	return nil
+}
+
+func removePackageDir(fullName string) error {
+	dir, err := getDirByFullName(fullName)
+	if err != nil {
+		return err
+	}
+
+	debug("checking dir: %s", dir)
+	if !fileio.Exists(dir) {
+		debug("package dir not found")
+		return nil
+	}
+
+	debug("deleting dir: %s", dir)
+	err = os.RemoveAll(dir)
+	if err != nil {
+		return fmt.Errorf("failed to delete package dir: %w", err)
+	}
+
+	debug("deleted package dir")
+	return nil
 }
 
 // getDirByFullName expands an owner-name package pair to a full package dir.

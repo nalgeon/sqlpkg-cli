@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/nalgeon/sqlpkg-cli/internal/lockfile"
 	"github.com/nalgeon/sqlpkg-cli/internal/spec"
 )
 
@@ -24,6 +25,11 @@ func UpdateAll(args []string) error {
 		return nil
 	}
 
+	lck, err := readLockfile()
+	if err != nil {
+		return err
+	}
+
 	count := 0
 	for _, path := range paths {
 		pkg, err := spec.ReadLocal(path)
@@ -33,16 +39,16 @@ func UpdateAll(args []string) error {
 		}
 
 		log("> updating %s...", pkg.FullName())
-		updated, err := updatePackage(pkg)
+		updPkg, err := updatePackage(lck, pkg.FullName())
 		if err != nil {
 			log("! error updating %s: %s", pkg.FullName(), err)
 			continue
 		}
-		if !updated {
+		if updPkg == nil {
 			log("✓ already at the latest version")
 			continue
 		}
-		log("✓ updated package %s to %s", pkg.FullName(), pkg.Version)
+		log("✓ updated package %s to %s", updPkg.FullName(), updPkg.Version)
 		count += 1
 	}
 
@@ -67,32 +73,67 @@ func Update(args []string) error {
 		return fmt.Errorf("invalid package: %w", err)
 	}
 
+	lck, err := readLockfile()
+	if err != nil {
+		return err
+	}
+
 	log("> updating %s...", pkg.FullName())
-	updated, err := updatePackage(pkg)
+	updPkg, err := updatePackage(lck, pkg.FullName())
 	if err != nil {
 		return fmt.Errorf("failed to update: %w", err)
 	}
 
-	if updated {
-		log("✓ updated package %s to %s", pkg.FullName(), pkg.Version)
-	} else {
+	if updPkg == nil {
 		log("✓ already at the latest version")
+		return nil
 	}
+
+	log("✓ updated package %s to %s", updPkg.FullName(), updPkg.Version)
 	return nil
 }
 
 // updatePackage updates a package.
 // Returns true if the package was actually updated, false otherwise
 // (already at the latest version or encountered an error).
-func updatePackage(pkg *spec.Package) (bool, error) {
-	cmd := new(command)
-	cmd.readSpec(pkg.FullName())
-	if !cmd.hasNewVersion() {
-		return false, nil
+func updatePackage(lck *lockfile.Lockfile, fullName string) (*spec.Package, error) {
+	pkg, err := readSpec(fullName)
+	if err != nil {
+		return nil, err
 	}
-	assetUrl := cmd.buildAssetPath()
-	asset := cmd.downloadAsset(assetUrl)
-	cmd.unpackAsset(asset)
-	cmd.installFiles()
-	return cmd.err != nil, cmd.err
+	if !hasNewVersion(pkg) {
+		return nil, nil
+	}
+
+	assetUrl, err := buildAssetPath(pkg)
+	if err != nil {
+		return nil, err
+	}
+
+	asset, err := downloadAsset(pkg, assetUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	err = validateAsset(pkg, asset)
+	if err != nil {
+		return nil, err
+	}
+
+	err = unpackAsset(pkg, asset)
+	if err != nil {
+		return nil, err
+	}
+
+	err = installFiles(pkg, asset)
+	if err != nil {
+		return nil, err
+	}
+
+	err = addToLockfile(lck, pkg)
+	if err != nil {
+		return nil, err
+	}
+
+	return pkg, nil
 }

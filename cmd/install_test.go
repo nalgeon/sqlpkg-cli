@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
+	"github.com/nalgeon/sqlpkg-cli/internal/lockfile"
 )
 
 func TestInstall(t *testing.T) {
 	workDir = "."
-	repoDir := setupRepo(t)
+	repoDir, lockPath := setupRepo(t)
 
 	pkgDir := filepath.Join(repoDir, "asg017", "hello")
 	args := []string{filepath.Join(workDir, "testdata", "hello.json")}
@@ -34,20 +35,37 @@ func TestInstall(t *testing.T) {
 		t.Fatal("asset files do not exist")
 	}
 
-	teardownRepo(t, repoDir)
+	lck, err := lockfile.ReadLocal(lockPath)
+	if err != nil {
+		t.Fatal("failed to read lockfile")
+	}
+	if !lck.Has("asg017/hello") {
+		t.Fatal("installed package not found in the lockfile")
+	}
+
+	teardownRepo(t, repoDir, lockPath)
 }
 
-func setupRepo(t *testing.T) string {
+func setupRepo(t *testing.T) (string, string) {
 	repoDir := filepath.Join(workDir, ".sqlpkg")
 	err := os.RemoveAll(repoDir)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	return repoDir
+	lockPath := filepath.Join(workDir, "sqlpkg.lock")
+	err = os.RemoveAll(lockPath)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	return repoDir, lockPath
 }
 
-func teardownRepo(t *testing.T, repoDir string) {
+func teardownRepo(t *testing.T, repoDir, lockPath string) {
 	err := os.RemoveAll(repoDir)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	err = os.RemoveAll(lockPath)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

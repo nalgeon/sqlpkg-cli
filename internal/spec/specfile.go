@@ -67,23 +67,23 @@ type Package struct {
 	Owner       string   `json:"owner"`
 	Name        string   `json:"name"`
 	Version     string   `json:"version"`
-	Homepage    string   `json:"homepage"`
-	Repository  string   `json:"repository"`
-	Specfile    string   `json:"specfile"`
-	Authors     []string `json:"authors"`
-	License     string   `json:"license"`
-	Description string   `json:"description"`
-	Keywords    []string `json:"keywords"`
-	Symbols     []string `json:"symbols"`
+	Homepage    string   `json:"homepage,omitempty"`
+	Repository  string   `json:"repository,omitempty"`
+	Specfile    string   `json:"specfile,omitempty"`
+	Authors     []string `json:"authors,omitempty"`
+	License     string   `json:"license,omitempty"`
+	Description string   `json:"description,omitempty"`
+	Keywords    []string `json:"keywords,omitempty"`
+	Symbols     []string `json:"symbols,omitempty"`
 	Assets      `json:"assets"`
 }
 
 // Assets are archives of package files, each for a specific platform.
 type Assets struct {
 	Path      *AssetPath        `json:"path"`
-	Pattern   string            `json:"pattern"`
+	Pattern   string            `json:"pattern,omitempty"`
 	Files     map[string]string `json:"files"`
-	Checksums map[string]string `json:"checksums"`
+	Checksums map[string]string `json:"checksums,omitempty"`
 }
 
 // FullName is an owner-name pair that uniquely identifies the package.

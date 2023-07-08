@@ -5,11 +5,12 @@ import (
 	"testing"
 
 	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
+	"github.com/nalgeon/sqlpkg-cli/internal/lockfile"
 )
 
 func TestUninstall(t *testing.T) {
 	workDir = "."
-	repoDir := setupRepo(t)
+	repoDir, lockPath := setupRepo(t)
 	install(t, repoDir)
 
 	IsVerbose = true
@@ -24,7 +25,15 @@ func TestUninstall(t *testing.T) {
 		t.Fatalf("package dir still exists: %v", pkgDir)
 	}
 
-	teardownRepo(t, repoDir)
+	lck, err := lockfile.ReadLocal(lockPath)
+	if err != nil {
+		t.Fatal("failed to read lockfile")
+	}
+	if lck.Has("asg017/hello") {
+		t.Fatal("uninstalled package found in the lockfile")
+	}
+
+	teardownRepo(t, repoDir, lockPath)
 }
 
 func install(t *testing.T, repoDir string) {

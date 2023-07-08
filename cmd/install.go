@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"errors"
+
+	"github.com/nalgeon/sqlpkg-cli/internal/spec"
 )
 
 const installHelp = "usage: sqlpkg install package"
@@ -15,22 +17,52 @@ func Install(args []string) error {
 	path := args[0]
 	log("> installing %s...", path)
 
-	cmd := new(command)
-	cmd.readSpec(path)
-	if !cmd.hasNewVersion() {
+	pkg, err := readSpec(path)
+	if err != nil {
+		return err
+	}
+
+	if !hasNewVersion(pkg) {
 		log("✓ already at the latest version")
 		return nil
 	}
-	assetPath := cmd.buildAssetPath()
-	asset := cmd.downloadAsset(assetPath)
-	cmd.validateAsset(asset)
-	cmd.unpackAsset(asset)
-	cmd.installFiles()
 
-	if cmd.err != nil {
-		return cmd.err
+	assetPath, err := buildAssetPath(pkg)
+	if err != nil {
+		return err
 	}
 
-	log("✓ installed package %s to %s", cmd.pkg.FullName(), cmd.dir)
-	return cmd.err
+	asset, err := downloadAsset(pkg, assetPath)
+	if err != nil {
+		return err
+	}
+
+	err = validateAsset(pkg, asset)
+	if err != nil {
+		return err
+	}
+
+	err = unpackAsset(pkg, asset)
+	if err != nil {
+		return err
+	}
+
+	err = installFiles(pkg, asset)
+	if err != nil {
+		return err
+	}
+
+	lck, err := readLockfile()
+	if err != nil {
+		return err
+	}
+
+	err = addToLockfile(lck, pkg)
+	if err != nil {
+		return err
+	}
+
+	dir := spec.Dir(workDir, pkg.Owner, pkg.Name)
+	log("✓ installed package %s to %s", pkg.FullName(), dir)
+	return nil
 }

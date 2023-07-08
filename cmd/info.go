@@ -3,6 +3,8 @@ package cmd
 import (
 	"errors"
 	"strings"
+
+	"github.com/nalgeon/sqlpkg-cli/internal/spec"
 )
 
 const infoHelp = "usage: sqlpkg info package"
@@ -14,34 +16,48 @@ func Info(args []string) error {
 	}
 
 	path := args[0]
-
-	cmd := new(command)
-	cmd.readSpec(path)
-	if cmd.err != nil {
-		return errors.New("package not found")
+	pkg, err := findSpec(path)
+	if err != nil {
+		return err
 	}
 
-	if cmd.pkg.Description != "" {
-		log(cmd.pkg.Description)
+	if pkg.Description != "" {
+		log(pkg.Description)
 	}
-	if cmd.pkg.Repository != "" {
-		log(cmd.pkg.Repository)
+	if pkg.Repository != "" {
+		log(pkg.Repository)
 	}
-	if len(cmd.pkg.Authors) != 0 {
-		authors := strings.Join(cmd.pkg.Authors, ", ")
+	if len(pkg.Authors) != 0 {
+		authors := strings.Join(pkg.Authors, ", ")
 		log("by %s", authors)
 	}
-	if cmd.pkg.Version != "" {
-		log("version: %s", cmd.pkg.Version)
+	if pkg.Version != "" {
+		log("version: %s", pkg.Version)
 	}
-	if cmd.pkg.License != "" {
-		log("license: %s", cmd.pkg.License)
+	if pkg.License != "" {
+		log("license: %s", pkg.License)
 	}
-	if cmd.isInstalled() {
+	if isInstalled(pkg) {
 		log("✓ installed")
 	} else {
 		log("✘ not installed")
 	}
 
 	return nil
+}
+
+// findSpec loads the package spec, giving preference to already installed packages.
+func findSpec(path string) (*spec.Package, error) {
+	installPath, err := getPathByFullName(path)
+	if err == nil {
+		pkg, err := spec.ReadLocal(installPath)
+		if err == nil {
+			debug("found installed package")
+			return pkg, nil
+		}
+	}
+
+	debug("installed package not found")
+	pkg, err := readSpec(path)
+	return pkg, err
 }
