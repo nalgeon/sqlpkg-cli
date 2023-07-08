@@ -23,8 +23,10 @@ func Install(args []string) error {
 	}
 	assetPath := cmd.buildAssetPath()
 	asset := cmd.downloadAsset(assetPath)
+	cmd.validateAsset(asset)
 	cmd.unpackAsset(asset)
 	cmd.installFiles()
+
 	if cmd.err != nil {
 		return cmd.err
 	}

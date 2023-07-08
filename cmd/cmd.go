@@ -152,6 +152,33 @@ func (cmd *command) downloadAsset(assetPath *spec.AssetPath) *assets.Asset {
 	return asset
 }
 
+// validateAsset checks if the asset is valid.
+func (cmd *command) validateAsset(asset *assets.Asset) bool {
+	if cmd.err != nil {
+		return false
+	}
+
+	checksumStr, ok := cmd.pkg.Checksums[asset.Name]
+	if !ok {
+		debug("spec is missing asset checksum")
+		return true
+	}
+
+	ok, err := asset.Validate(checksumStr)
+	if err != nil {
+		cmd.err = fmt.Errorf("failed to validate asset: %w", err)
+		return false
+	}
+
+	if !ok {
+		cmd.err = fmt.Errorf("asset checksum is invalid")
+		return false
+	}
+
+	debug("asset checksum is valid")
+	return ok
+}
+
 // unpackAsset unpacks package asset.
 func (cmd *command) unpackAsset(asset *assets.Asset) {
 	if cmd.err != nil {

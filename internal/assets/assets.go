@@ -5,6 +5,7 @@ import (
 	"archive/tar"
 	"archive/zip"
 	"compress/gzip"
+	"encoding/hex"
 	"errors"
 	"io"
 	"net/url"
@@ -23,6 +24,19 @@ type Asset struct {
 	Checksum []byte
 }
 
+// Validate compares the asset checksum against the provided checksum string.
+func (a *Asset) Validate(checksumStr string) (bool, error) {
+	algo, str, ok := strings.Cut(checksumStr, "-")
+	if !ok || algo != "sha256" {
+		return false, errors.New("unsupported checksum algorithm")
+	}
+	checksum, err := hex.DecodeString(str)
+	if err != nil {
+		return false, errors.New("failed to decode checksum string")
+	}
+	return areEqual(a.Checksum, checksum), nil
+}
+
 // Download downloads an asset from the remote url to the local dir.
 func Download(dir, rawURL string) (asset *Asset, err error) {
 	url, err := url.Parse(rawURL)
@@ -31,7 +45,8 @@ func Download(dir, rawURL string) (asset *Asset, err error) {
 	}
 
 	name := filepath.Base(url.Path)
-	file, err := os.Create(filepath.Join(dir, name))
+	path := filepath.Join(dir, name)
+	file, err := os.Create(path)
 	if err != nil {
 		return nil, err
 	}
@@ -47,18 +62,31 @@ func Download(dir, rawURL string) (asset *Asset, err error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Asset{name, size, nil}, nil
+
+	checksum, err := fileio.CalcChecksum(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Asset{name, size, checksum}, nil
 }
 
 // Copy copies an asset from the local path to the local dir.
 func Copy(dir, path string) (asset *Asset, err error) {
 	_, name := filepath.Split(path)
 	dstPath := filepath.Join(dir, name)
+
 	size, err := fileio.CopyFile(path, dstPath)
 	if err != nil {
 		return nil, err
 	}
-	return &Asset{name, int64(size), nil}, nil
+
+	checksum, err := fileio.CalcChecksum(dstPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Asset{name, int64(size), checksum}, nil
 }
 
 // Unpack unpacks an asset from the given path to the same dir
@@ -172,4 +200,19 @@ func unpackTarGz(path, pattern, dir string) (int, error) {
 		dstFile.Close()
 		count += 1
 	}
+}
+
+// areEqual checks if two slices are equal.
+func areEqual[T comparable](s1, s2 []T) bool {
+	if len(s1) != len(s2) {
+		return false
+	}
+
+	for i, v := range s1 {
+		if v != s2[i] {
+			return false
+		}
+	}
+
+	return true
 }

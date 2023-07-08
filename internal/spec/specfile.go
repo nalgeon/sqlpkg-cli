@@ -81,9 +81,10 @@ type Package struct {
 
 // Assets are archives of package files, each for a specific platform.
 type Assets struct {
-	Path    *AssetPath        `json:"path"`
-	Pattern string            `json:"pattern"`
-	Files   map[string]string `json:"files"`
+	Path      *AssetPath        `json:"path"`
+	Pattern   string            `json:"pattern"`
+	Files     map[string]string `json:"files"`
+	Checksums map[string]string `json:"checksums"`
 }
 
 // FullName is an owner-name pair that uniquely identifies the package.
@@ -121,7 +122,6 @@ func (p *Package) AssetPath(os, arch string) (*AssetPath, error) {
 	}
 	path := p.Assets.Path.Join(asset)
 	return path, nil
-
 }
 
 // Save writes the package spec file to the specified directory.

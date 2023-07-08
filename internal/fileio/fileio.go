@@ -1,7 +1,11 @@
 // Package fileio provides high-level file operations.
 package fileio
 
-import "os"
+import (
+	"crypto/sha256"
+	"io"
+	"os"
+)
 
 // CreateDir creates an empty directory.
 // If the directory already exists, deletes it and creates a new one.
@@ -49,4 +53,21 @@ func CopyFile(src, dst string) (int, error) {
 func Exists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
+}
+
+// CalcChecksum calculates the SHA-256 checksum of a file.
+func CalcChecksum(path string) ([]byte, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	hash := sha256.New()
+	_, err = io.Copy(hash, file)
+	if err != nil {
+		return nil, err
+	}
+
+	return hash.Sum(nil), nil
 }
