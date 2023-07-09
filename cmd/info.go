@@ -48,16 +48,28 @@ func Info(args []string) error {
 
 // findSpec loads the package spec, giving preference to already installed packages.
 func findSpec(path string) (*spec.Package, error) {
-	installPath, err := getPathByFullName(path)
-	if err == nil {
-		pkg, err := spec.ReadLocal(installPath)
-		if err == nil {
-			debug("found installed package")
-			return pkg, nil
-		}
+	pkg := readInstalledSpec(path)
+	if pkg != nil {
+		return pkg, nil
 	}
 
 	debug("installed package not found")
 	pkg, err := readSpec(path)
 	return pkg, err
+}
+
+// readInstalledSpec loads the package spec for an installed package (if any).
+func readInstalledSpec(fullName string) *spec.Package {
+	path, err := getPathByFullName(fullName)
+	if err != nil {
+		return nil
+	}
+
+	pkg, err := spec.ReadLocal(path)
+	if err != nil {
+		return nil
+	}
+
+	debug("found installed package")
+	return pkg
 }

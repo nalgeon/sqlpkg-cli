@@ -20,64 +20,73 @@ func List(args []string) error {
 		return errors.New(listHelp)
 	}
 
+	packages, err := gatherPackages()
+	if err != nil {
+		return err
+	}
+
 	lck, err := readLockfile()
 	if err != nil {
 		return err
 	}
-	debug("found %d packages in lockfile", len(lck.Packages))
 
-	addedCount, err := addInstalledPackages(lck)
-	if err != nil {
-		return err
-	}
-	if addedCount > 0 {
-		debug("found %d installed packages not in lockfile", addedCount)
-		lck.Save(workDir)
-	}
-
-	packages, err := gatherLockfilePackages(lck)
+	err = addMissingToLockfile(lck, packages)
 	if err != nil {
 		return err
 	}
 
-	sort.Slice(packages, func(i, j int) bool {
-		return packages[i].FullName() < packages[j].FullName()
-	})
+	sortPackages(packages)
 	printPackages(packages)
 	return nil
 }
 
-// addInstalledPackages checks for installed packages
-// missing from the lockfile and adds them there.
-func addInstalledPackages(lck *lockfile.Lockfile) (int, error) {
+// gatherPackages collects installed packages.
+func gatherPackages() ([]*spec.Package, error) {
 	pattern := fmt.Sprintf("%s/%s/*/*/%s", workDir, spec.DirName, spec.FileName)
 	paths, _ := filepath.Glob(pattern)
 
-	count := 0
+	packages := []*spec.Package{}
 	for _, path := range paths {
 		pkg, err := spec.ReadLocal(path)
 		if err != nil {
-			return 0, fmt.Errorf("invalid package spec: %s", path)
-		}
-		if !lck.Has(pkg.FullName()) {
-			lck.Add(pkg)
-			count += 1
-		}
-	}
-	return count, nil
-}
-
-// gatherLockfilePackages returns packages listed in the lockfile.
-func gatherLockfilePackages(lck *lockfile.Lockfile) ([]*spec.Package, error) {
-	packages := make([]*spec.Package, 0, len(lck.Packages))
-	for fullName, pkg := range lck.Packages {
-		if !isInstalled(pkg) {
-			err := fmt.Errorf("package %s listed in specfile but not installed", fullName)
-			return nil, err
+			return nil, fmt.Errorf("invalid package spec: %s", path)
 		}
 		packages = append(packages, pkg)
 	}
+
+	debug("gathered %d packages", len(packages))
 	return packages, nil
+}
+
+// addMissingToLockfile adds missing packages to the lockfile.
+func addMissingToLockfile(lck *lockfile.Lockfile, packages []*spec.Package) error {
+	count := 0
+	for _, pkg := range packages {
+		if lck.Has(pkg.FullName()) {
+			continue
+		}
+		lck.Add(pkg)
+		count += 1
+	}
+
+	if count == 0 {
+		return nil
+	}
+
+	err := lck.Save(workDir)
+	if err != nil {
+		return fmt.Errorf("failed to save lockfile: %w", err)
+	}
+
+	debug("added %d packages to the lockfile", count)
+	return nil
+}
+
+// sortPackages sorts packages by full name.
+func sortPackages(packages []*spec.Package) {
+	sort.Slice(packages, func(i, j int) bool {
+		return packages[i].FullName() < packages[j].FullName()
+	})
 }
 
 // printPackages prints packages.
