@@ -18,30 +18,13 @@ func Info(args []string) error {
 	path := args[0]
 	pkg, err := findSpec(path)
 	if err != nil {
-		return err
+		debug(err.Error())
+		log("package not found")
+		return nil
 	}
 
-	if pkg.Description != "" {
-		log(pkg.Description)
-	}
-	if pkg.Repository != "" {
-		log(pkg.Repository)
-	}
-	if len(pkg.Authors) != 0 {
-		authors := strings.Join(pkg.Authors, ", ")
-		log("by %s", authors)
-	}
-	if pkg.Version != "" {
-		log("version: %s", pkg.Version)
-	}
-	if pkg.License != "" {
-		log("license: %s", pkg.License)
-	}
-	if isInstalled(pkg) {
-		log("✓ installed")
-	} else {
-		log("✘ not installed")
-	}
+	lines := prepareInfo(pkg)
+	log(strings.Join(lines, "\n"))
 
 	return nil
 }
@@ -72,4 +55,35 @@ func readInstalledSpec(fullName string) *spec.Package {
 
 	debug("found installed package")
 	return pkg
+}
+
+// prepareInfo returns detailed package description.
+func prepareInfo(pkg *spec.Package) []string {
+	lines := []string{}
+
+	header := pkg.FullName()
+	if pkg.Version != "" {
+		header += "@" + pkg.Version
+	}
+	if len(pkg.Authors) != 0 {
+		authors := strings.Join(pkg.Authors, ", ")
+		header += " by " + authors
+	}
+	lines = append(lines, header)
+
+	if pkg.Description != "" {
+		lines = append(lines, pkg.Description)
+	}
+	if pkg.Repository != "" {
+		lines = append(lines, pkg.Repository)
+	}
+	if pkg.License != "" {
+		lines = append(lines, "license: "+pkg.License)
+	}
+	if isInstalled(pkg) {
+		lines = append(lines, "✓ installed")
+	} else {
+		lines = append(lines, "✘ not installed")
+	}
+	return lines
 }
