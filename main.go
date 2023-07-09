@@ -9,6 +9,8 @@ import (
 	"github.com/nalgeon/sqlpkg-cli/cmd"
 )
 
+var version = "main"
+
 func execCommand() error {
 	if len(os.Args) < 2 {
 		return cmd.Help(nil)
@@ -38,6 +40,9 @@ func execCommand() error {
 		return cmd.Info(args)
 	case "help":
 		return cmd.Help(args)
+	case "version":
+		fmt.Println(version)
+		return nil
 	default:
 		return errors.New("unknown command")
 	}
