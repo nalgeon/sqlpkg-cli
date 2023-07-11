@@ -17,7 +17,7 @@ var commandsHelp = map[string]string{
 	"help":      "Display help",
 	"info":      "Display package information",
 	"init":      "Create a local repository",
-	"install":   "Install a package",
+	"install":   "Install packages",
 	"list":      "List installed packages",
 	"uninstall": "Uninstall a package",
 	"update":    "Update installed packages",

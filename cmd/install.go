@@ -2,11 +2,46 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/nalgeon/sqlpkg-cli/internal/spec"
 )
 
-const installHelp = "usage: sqlpkg install package"
+const installHelp = "usage: sqlpkg install [package]"
+
+// InstallAll installs all packages from the lockfile.
+func InstallAll(args []string) error {
+	lck, err := readLockfile()
+	if err != nil {
+		return err
+	}
+	debug("loaded the lockfile with %d packages", len(lck.Packages))
+
+	if len(lck.Packages) == 0 {
+		log("no packages found in the lockfile")
+		return nil
+	}
+
+	errCount := 0
+	for _, pkg := range lck.Packages {
+		path := pkg.Specfile
+		if path == "" {
+			debug("missing specfile for %s, falling back to name/owner", pkg.FullName())
+			path = pkg.FullName()
+		}
+		err = installPackage(path)
+		if err != nil {
+			errCount += 1
+			log("! %s", err)
+		}
+	}
+
+	if errCount > 0 {
+		return fmt.Errorf("failed to install %d packages", errCount)
+	}
+	log("installed %d packages", len(lck.Packages))
+	return nil
+}
 
 // Install installs a new package or updates an existing one.
 func Install(args []string) error {
@@ -15,6 +50,12 @@ func Install(args []string) error {
 	}
 
 	path := args[0]
+	err := installPackage(path)
+	return err
+}
+
+// installPackage installs a package using a specfile from a given path.
+func installPackage(path string) error {
 	log("> installing %s...", path)
 
 	pkg, err := readSpec(path)

@@ -26,14 +26,17 @@ func execCommand() error {
 	case "init":
 		return cmd.Init(args)
 	case "install":
+		if len(args) == 0 {
+			return cmd.InstallAll(args)
+		}
 		return cmd.Install(args)
 	case "uninstall":
 		return cmd.Uninstall(args)
 	case "update":
-		if len(args) == 1 {
-			return cmd.Update(args)
+		if len(args) == 0 {
+			return cmd.UpdateAll(args)
 		}
-		return cmd.UpdateAll(args)
+		return cmd.Update(args)
 	case "list":
 		return cmd.List(args)
 	case "info":
