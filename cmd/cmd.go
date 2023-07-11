@@ -235,7 +235,7 @@ func removePackageDir(fullName string) error {
 	debug("checking dir: %s", dir)
 	if !fileio.Exists(dir) {
 		debug("package dir not found")
-		return nil
+		return errors.New("package is not installed")
 	}
 
 	debug("deleting dir: %s", dir)
