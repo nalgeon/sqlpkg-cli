@@ -12,6 +12,8 @@ func Uninstall(args []string) error {
 		return errors.New(uninstallHelp)
 	}
 
+	printLocalRepo()
+
 	fullName := args[0]
 	log("> uninstalling %s...", fullName)
 

@@ -17,6 +17,8 @@ func UpdateAll(args []string) error {
 		return errors.New(updateHelp)
 	}
 
+	printLocalRepo()
+
 	pattern := fmt.Sprintf("%s/%s/*/*/%s", workDir, spec.DirName, spec.FileName)
 	paths, _ := filepath.Glob(pattern)
 

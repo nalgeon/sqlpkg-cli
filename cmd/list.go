@@ -91,9 +91,7 @@ func sortPackages(packages []*spec.Package) {
 
 // printPackages prints packages.
 func printPackages(packages []*spec.Package) {
-	if workDir == "." {
-		log("(local repository)")
-	}
+	printLocalRepo()
 	if len(packages) == 0 {
 		log("no packages installed")
 		return
@@ -104,5 +102,11 @@ func printPackages(packages []*spec.Package) {
 
 	for _, pkg := range packages {
 		fmt.Fprintln(w, pkg.FullName(), "\t", pkg.Description)
+	}
+}
+
+func printLocalRepo() {
+	if workDir == "." {
+		log("(local repository)")
 	}
 }
