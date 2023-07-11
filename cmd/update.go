@@ -50,7 +50,11 @@ func UpdateAll(args []string) error {
 			log("✓ already at the latest version")
 			continue
 		}
-		log("✓ updated package %s to %s", updPkg.FullName(), updPkg.Version)
+		updVersion := updPkg.Version
+		if updVersion == "" {
+			updVersion = "latest version"
+		}
+		log("✓ updated package %s to %s", updPkg.FullName(), updVersion)
 		count += 1
 	}
 
