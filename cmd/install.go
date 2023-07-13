@@ -26,12 +26,7 @@ func InstallAll(args []string) error {
 
 	errCount := 0
 	for _, pkg := range lck.Packages {
-		path := pkg.Specfile
-		if path == "" {
-			debug("missing specfile for %s, falling back to name/owner", pkg.FullName())
-			path = pkg.FullName()
-		}
-		err = installPackage(path)
+		err = installLockedPackage(pkg)
 		if err != nil {
 			errCount += 1
 			log("! %s", err)
@@ -106,6 +101,64 @@ func installPackage(path string) error {
 	if err != nil {
 		return err
 	}
+
+	dir := spec.Dir(workDir, pkg.Owner, pkg.Name)
+	log("✓ installed package %s to %s", pkg.FullName(), dir)
+	return nil
+}
+
+// installLockedPackage installs a specific version of a package from the lockfile.
+func installLockedPackage(lckPkg *spec.Package) error {
+	path := lckPkg.Specfile
+	if path == "" {
+		debug("missing specfile for %s, falling back to name/owner", lckPkg.FullName())
+		path = lckPkg.FullName()
+	}
+
+	log("> installing %s...", path)
+
+	pkg, err := readSpec(path)
+	if err != nil {
+		return err
+	}
+
+	// lock the version
+	debug("locked version = %s", lckPkg.Version)
+	pkg.Version = lckPkg.Version
+	pkg.Assets = lckPkg.Assets
+
+	if !hasNewVersion(pkg) {
+		log("✓ already at the %s version", pkg.Version)
+		return nil
+	}
+
+	assetPath, err := buildAssetPath(pkg)
+	if err != nil {
+		return err
+	}
+
+	asset, err := downloadAsset(pkg, assetPath)
+	if err != nil {
+		return err
+	}
+
+	err = validateAsset(pkg, asset)
+	if err != nil {
+		return err
+	}
+
+	err = unpackAsset(pkg, asset)
+	if err != nil {
+		return err
+	}
+
+	err = installFiles(pkg, asset)
+	if err != nil {
+		return err
+	}
+
+	// no need to add the package to the lockfile,
+	// it's already there
 
 	dir := spec.Dir(workDir, pkg.Owner, pkg.Name)
 	log("✓ installed package %s to %s", pkg.FullName(), dir)

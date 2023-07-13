@@ -75,7 +75,7 @@ type Package struct {
 	Description string   `json:"description,omitempty"`
 	Keywords    []string `json:"keywords,omitempty"`
 	Symbols     []string `json:"symbols,omitempty"`
-	Assets      `json:"assets"`
+	Assets      Assets   `json:"assets"`
 }
 
 // Assets are archives of package files, each for a specific platform.

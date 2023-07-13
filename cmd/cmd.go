@@ -126,7 +126,7 @@ func downloadAsset(pkg *spec.Package, assetPath *spec.AssetPath) (*assets.Asset,
 
 // validateAsset checks if the asset is valid.
 func validateAsset(pkg *spec.Package, asset *assets.Asset) error {
-	checksumStr, ok := pkg.Checksums[asset.Name]
+	checksumStr, ok := pkg.Assets.Checksums[asset.Name]
 	if !ok {
 		debug("spec is missing asset checksum")
 		return nil
