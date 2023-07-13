@@ -119,4 +119,4 @@ That's all for now. Now try some packages!
 
 [⬇️ Download](https://github.com/nalgeon/sqlpkg-cli/releases/latest) •
 [✨ Explore](https://sqlpkg.org/) •
-[🚀 Follow](https://twitter.com/ohmypy)
+[🚀 Follow](https://antonz.org/subscribe/)
