@@ -73,6 +73,14 @@ sqlpkg update
 
 Updates all installed packages to the latest versions.
 
+### `uninstall`
+
+```
+sqlpkg uninstall nalgeon/stats
+```
+
+Uninstalls a previously installed package.
+
 ### `list`
 
 ```
@@ -89,13 +97,13 @@ sqlpkg info nalgeon/stats
 
 Displays package information. Works with both local and remote packages.
 
-### `uninstall`
+### `version`
 
 ```
-sqlpkg uninstall nalgeon/stats
+sqlpkg version
 ```
 
-Uninstalls a previously installed package.
+Displays `sqlpkg` version number.
 
 ## Using a local repository
 
@@ -114,6 +122,20 @@ It will create an `.sqlpkg` folder in the current directory. After that, all oth
 The package spec file describes a particular package so that `sqlpkg` can work with it. It is usually created by the package author, so if you are a `sqlpkg` user, you don't need to worry about that.
 
 If you _are_ a package author, who wants your package to be installable by `sqlpkg`, learn how to create a spec file using [this guide](docs/spec-file.md) (coming soon).
+
+## Lockfile
+
+`sqlpkg` stores information about the installed packages in a special file (the _lockfile_) — `sqlpkg.lock`. If you're using a local repository, it's a good idea to commit `sqlpkg.lock` along with other code. This way, when you check out the code on another machine, you can install all the packages at once.
+
+To install the packages listed in the specfile, simply run `install` with no arguments:
+
+```
+sqlpkg install
+```
+
+`sqlpkg` will detect the lockfile (in the current folder or the user's home folder) and install all the packages listed in it.
+
+──
 
 That's all for now. Now try some packages!
 
