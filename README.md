@@ -127,7 +127,7 @@ If you _are_ a package author, who wants your package to be installable by `sqlp
 
 `sqlpkg` stores information about the installed packages in a special file (the _lockfile_) — `sqlpkg.lock`. If you're using a local repository, it's a good idea to commit `sqlpkg.lock` along with other code. This way, when you check out the code on another machine, you can install all the packages at once.
 
-To install the packages listed in the specfile, simply run `install` with no arguments:
+To install the packages listed in the lockfile, simply run `install` with no arguments:
 
 ```
 sqlpkg install
