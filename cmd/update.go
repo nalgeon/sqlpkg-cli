@@ -19,7 +19,7 @@ func UpdateAll(args []string) error {
 
 	printLocalRepo()
 
-	pattern := fmt.Sprintf("%s/%s/*/*/%s", workDir, spec.DirName, spec.FileName)
+	pattern := filepath.Join(workDir, spec.DirName, "*", "*", spec.FileName)
 	paths, _ := filepath.Glob(pattern)
 
 	if len(paths) == 0 {

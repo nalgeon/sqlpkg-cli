@@ -42,7 +42,7 @@ func List(args []string) error {
 
 // gatherPackages collects installed packages.
 func gatherPackages() ([]*spec.Package, error) {
-	pattern := fmt.Sprintf("%s/%s/*/*/%s", workDir, spec.DirName, spec.FileName)
+	pattern := filepath.Join(workDir, spec.DirName, "*", "*", spec.FileName)
 	paths, _ := filepath.Glob(pattern)
 
 	packages := []*spec.Package{}
