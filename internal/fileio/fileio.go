@@ -4,8 +4,12 @@ package fileio
 import (
 	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"io"
 	"os"
+	"os/exec"
+	"runtime"
+	"strings"
 )
 
 // CreateDir creates an empty directory.
@@ -85,4 +89,30 @@ func CalcChecksum(path string) ([]byte, error) {
 	}
 
 	return hash.Sum(nil), nil
+}
+
+// Dequarantine removes the macOS quarantine flag from a file.
+func Dequarantine(path string) error {
+	if runtime.GOOS != "darwin" {
+		return nil
+	}
+	var cmdOut, cmdErr strings.Builder
+	cmd := exec.Command("xattr", "-d", "com.apple.quarantine", path)
+	cmd.Stdout = &cmdOut
+	cmd.Stderr = &cmdErr
+	err := cmd.Run()
+	if err == nil {
+		return nil
+	}
+	switch err.(type) {
+	case *exec.ExitError:
+		errStr := cmdErr.String()
+		if strings.Contains(errStr, "No such xattr") {
+			// missing quarantine flag is not an error
+			return nil
+		}
+		return errors.New(errStr)
+	default:
+		return err
+	}
 }

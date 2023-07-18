@@ -92,6 +92,11 @@ func installPackage(path string) error {
 		return err
 	}
 
+	err = dequarantineFiles(pkg)
+	if err != nil {
+		return err
+	}
+
 	lck, err := readLockfile()
 	if err != nil {
 		return err
@@ -153,6 +158,11 @@ func installLockedPackage(lckPkg *spec.Package) error {
 	}
 
 	err = installFiles(pkg, asset)
+	if err != nil {
+		return err
+	}
+
+	err = dequarantineFiles(pkg)
 	if err != nil {
 		return err
 	}

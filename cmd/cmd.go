@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -176,6 +177,32 @@ func installFiles(pkg *spec.Package, asset *assets.Asset) error {
 		return fmt.Errorf("failed to write package spec: %w", err)
 	}
 
+	return nil
+}
+
+// dequarantineFiles removes the macOS quarantine flag
+// from all *.dylib files in the package directory.
+func dequarantineFiles(pkg *spec.Package) error {
+	if runtime.GOOS != "darwin" {
+		return nil
+	}
+
+	pattern := filepath.Join(spec.Dir(workDir, pkg.Owner, pkg.Name), "*.dylib")
+	paths, _ := filepath.Glob(pattern)
+	if len(paths) == 0 {
+		return nil
+	}
+
+	var allErr error
+	for _, path := range paths {
+		err := fileio.Dequarantine(path)
+		allErr = errors.Join(allErr, err)
+	}
+	if allErr != nil {
+		return fmt.Errorf("failed to dequarantine files: %w", allErr)
+	}
+
+	debug("removed %d files from quarantine", len(paths))
 	return nil
 }
 

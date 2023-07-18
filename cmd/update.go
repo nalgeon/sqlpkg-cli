@@ -136,6 +136,11 @@ func updatePackage(lck *lockfile.Lockfile, fullName string) (*spec.Package, erro
 		return nil, err
 	}
 
+	err = dequarantineFiles(pkg)
+	if err != nil {
+		return nil, err
+	}
+
 	err = addToLockfile(lck, pkg)
 	if err != nil {
 		return nil, err
