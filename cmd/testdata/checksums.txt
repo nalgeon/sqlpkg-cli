@@ -1,0 +1,4 @@
+057e2889fc1fba73db7a96931a8e682a616a2dc77ca4357c7e3ac5aa21e6f202 sqlite-hello-v0.1.0-linux-x86_64.tar.gz
+56fb260b515ae02c32cd7d461480ad60a7e6a5ba8de69814d4457b893bef3c93 sqlite-hello-v0.1.0-macos-aarch64.tar.gz
+4bd181225ec9114b02a083dbd6752d42ea4983e5d9d5f2f1e25a7bc8868421ce sqlite-hello-v0.1.0-macos-x86_64.tar.gz
+996623e753cb96a949817900cfc2b163619deda94afa8e55ee6892ffe1f9a91a sqlite-hello-v0.1.0-windows-x86_64.zip

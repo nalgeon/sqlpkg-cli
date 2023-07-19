@@ -107,8 +107,14 @@ func updatePackage(lck *lockfile.Lockfile, fullName string) (*spec.Package, erro
 	if err != nil {
 		return nil, err
 	}
+
 	if !hasNewVersion(pkg) {
 		return nil, nil
+	}
+
+	err = readChecksums(pkg)
+	if err != nil {
+		return nil, err
 	}
 
 	assetUrl, err := buildAssetPath(pkg)

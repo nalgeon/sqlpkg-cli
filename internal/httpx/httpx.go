@@ -55,32 +55,32 @@ func GetBody(url string, accept string) (io.ReadCloser, error) {
 
 // GetJSON issues a GET request and decodes the response as JSON.
 func GetJSON[T any](url string) (*T, error) {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	body, err := GetBody(url, "application/json")
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Accept", "application/json")
+	defer body.Close()
 
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("got http status %d", resp.StatusCode)
-	}
-
-	body, err := io.ReadAll(resp.Body)
+	data, err := io.ReadAll(body)
 	if err != nil {
 		return nil, err
 	}
 
 	var val T
-	err = json.Unmarshal(body, &val)
+	err = json.Unmarshal(data, &val)
 	if err != nil {
 		return nil, err
 	}
 
 	return &val, nil
+}
+
+// GetBytes issues a GET request and decodes the response as bytes.
+func GetBytes(url string) ([]byte, error) {
+	body, err := GetBody(url, "*/*")
+	if err != nil {
+		return nil, err
+	}
+	defer body.Close()
+	return io.ReadAll(body)
 }

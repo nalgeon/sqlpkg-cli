@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/nalgeon/sqlpkg-cli/internal/assets"
+	"github.com/nalgeon/sqlpkg-cli/internal/checksums"
 	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
 	"github.com/nalgeon/sqlpkg-cli/internal/lockfile"
 	"github.com/nalgeon/sqlpkg-cli/internal/spec"
@@ -47,6 +48,22 @@ func readSpec(path string) (*spec.Package, error) {
 	debug("found package spec at %s", pkg.Specfile)
 	debug("read package %s, version = %s", pkg.FullName(), pkg.Version)
 	return pkg, nil
+}
+
+// readChecksums reads package asset checksums from the checksum file.
+func readChecksums(pkg *spec.Package) error {
+	path := pkg.Assets.Path.Join(checksums.FileName)
+	if !checksums.Exists(path.Value, path.IsRemote) {
+		debug("missing spec checksum file")
+		return nil
+	}
+	sums, err := checksums.Read(path.Value, path.IsRemote)
+	if err != nil {
+		return fmt.Errorf("failed to read checksum file: %w", err)
+	}
+	debug("read %d checksums", len(sums))
+	pkg.Assets.Checksums = sums
+	return nil
 }
 
 // isInstalled checks if there is a local package installed.

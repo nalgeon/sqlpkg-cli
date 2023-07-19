@@ -67,6 +67,11 @@ func installPackage(path string) error {
 		return nil
 	}
 
+	err = readChecksums(pkg)
+	if err != nil {
+		return err
+	}
+
 	assetPath, err := buildAssetPath(pkg)
 	if err != nil {
 		return err

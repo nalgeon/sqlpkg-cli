@@ -43,6 +43,13 @@ func TestInstall(t *testing.T) {
 		t.Fatal("installed package not found in the lockfile")
 	}
 
+	pkg := lck.Packages["asg017/hello"]
+	nAssets := len(pkg.Assets.Files)
+	nChecksums := len(pkg.Assets.Checksums)
+	if nChecksums != nAssets {
+		t.Fatalf("got %d checksums, want %d", nChecksums, nAssets)
+	}
+
 	teardownRepo(t, repoDir, lockPath)
 }
 
