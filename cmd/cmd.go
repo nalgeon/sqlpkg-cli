@@ -94,11 +94,7 @@ func hasNewVersion(pkg *spec.Package) bool {
 		return false
 	}
 
-	if semver.Compare(oldPkg.Version, pkg.Version) < 0 {
-		return false
-	}
-
-	return true
+	return compareVersions(oldPkg.Version, pkg.Version) < 0
 }
 
 // buildAssetPath constructs an URL to download package asset.
@@ -310,6 +306,22 @@ func getPathByFullName(fullName string) (string, error) {
 	}
 	path := spec.Path(workDir, parts[0], parts[1])
 	return path, nil
+}
+
+// compareVersions compares package versions.
+// Returns 0 if v == w, -1 if v < w, or +1 if v > w.
+func compareVersions(v, w string) int {
+	if v == "" || w == "" {
+		return 0
+	}
+	// add the leading 'v' if needed
+	if v[0] != 'v' {
+		v = "v" + v
+	}
+	if w[0] != 'v' {
+		w = "v" + w
+	}
+	return semver.Compare(v, w)
 }
 
 var IsVerbose bool
