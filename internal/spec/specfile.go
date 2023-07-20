@@ -108,6 +108,16 @@ func (p *Package) ExpandVars() {
 	}
 }
 
+// ForceVersion forces a specific package version.
+func (p *Package) ForceVersion(version string) {
+	p.Version = version
+	// FIXME: may erroneously replace "latest" where it is not a version
+	p.Assets.Path.Value = strings.Replace(p.Assets.Path.Value, "latest", version, 1)
+	for platform, file := range p.Assets.Files {
+		p.Assets.Files[platform] = strings.Replace(file, "latest", version, 1)
+	}
+}
+
 // AssetPath determines the package url for a specific platform (OS + architecture).
 func (p *Package) AssetPath(os, arch string) (*AssetPath, error) {
 	platform := os + "-" + arch

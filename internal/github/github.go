@@ -9,7 +9,8 @@ import (
 	"github.com/nalgeon/sqlpkg-cli/internal/httpx"
 )
 
-const base_url = "https://api.github.com"
+const Hostname = "github.com"
+const apiUrl = "https://api.github.com"
 
 type release struct {
 	TagName string `json:"tag_name"`
@@ -32,8 +33,9 @@ func ParseRepoUrl(repoUrl string) (owner string, repo string, err error) {
 	return
 }
 
-func GetLatestVersion(owner, repo string) (string, error) {
-	url := fmt.Sprintf("%s/repos/%s/%s/releases/latest", base_url, owner, repo)
+// GetLatestTag fetches the latest release tag number for the repository.
+func GetLatestTag(owner, repo string) (string, error) {
+	url := fmt.Sprintf("%s/repos/%s/%s/releases/latest", apiUrl, owner, repo)
 	rel, err := httpx.GetJSON[release](url)
 	if err != nil {
 		return "", err

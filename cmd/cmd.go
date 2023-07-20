@@ -57,19 +57,24 @@ func resolveVersion(pkg *spec.Package) error {
 	if pkg.Version != "latest" {
 		return nil
 	}
+
 	hostname := httpx.Hostname(pkg.Repository)
-	if hostname != "github.com" {
-		return fmt.Errorf("unknown repository domain: %s", hostname)
+	if hostname != github.Hostname {
+		debug("unknown provider %s, not resolving version", hostname)
+		return nil
 	}
+
 	owner, repo, err := github.ParseRepoUrl(pkg.Repository)
 	if err != nil {
 		return fmt.Errorf("failed to parse repo url: %v", err)
 	}
-	version, err := github.GetLatestVersion(owner, repo)
+
+	version, err := github.GetLatestTag(owner, repo)
 	if err != nil {
-		return fmt.Errorf("failed to get latest version: %w", err)
+		return fmt.Errorf("failed to get latest tag: %w", err)
 	}
-	pkg.Version = version
+
+	pkg.ForceVersion(version)
 	debug("resolved latest version = %s", version)
 	return nil
 }
