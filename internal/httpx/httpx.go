@@ -24,6 +24,16 @@ func IsURL(path string) bool {
 	return true
 }
 
+// Hostname returns the domain part of the url
+// or an empty string if the url is invalid.
+func Hostname(rawUrl string) string {
+	u, err := url.Parse(rawUrl)
+	if err != nil {
+		return ""
+	}
+	return u.Hostname()
+}
+
 // Exists checks if the specified url exists.
 func Exists(url string) bool {
 	resp, err := http.Head(url)

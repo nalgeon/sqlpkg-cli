@@ -108,6 +108,11 @@ func updatePackage(lck *lockfile.Lockfile, fullName string) (*spec.Package, erro
 		return nil, err
 	}
 
+	err = resolveVersion(pkg)
+	if err != nil {
+		return nil, err
+	}
+
 	if !hasNewVersion(pkg) {
 		return nil, nil
 	}

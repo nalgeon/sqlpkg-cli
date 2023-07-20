@@ -11,6 +11,8 @@ import (
 	"github.com/nalgeon/sqlpkg-cli/internal/assets"
 	"github.com/nalgeon/sqlpkg-cli/internal/checksums"
 	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
+	"github.com/nalgeon/sqlpkg-cli/internal/github"
+	"github.com/nalgeon/sqlpkg-cli/internal/httpx"
 	"github.com/nalgeon/sqlpkg-cli/internal/lockfile"
 	"github.com/nalgeon/sqlpkg-cli/internal/spec"
 	"golang.org/x/mod/semver"
@@ -48,6 +50,28 @@ func readSpec(path string) (*spec.Package, error) {
 	debug("found package spec at %s", pkg.Specfile)
 	debug("read package %s, version = %s", pkg.FullName(), pkg.Version)
 	return pkg, nil
+}
+
+// resolveVersion resolves the latest version if needed.
+func resolveVersion(pkg *spec.Package) error {
+	if pkg.Version != "latest" {
+		return nil
+	}
+	hostname := httpx.Hostname(pkg.Repository)
+	if hostname != "github.com" {
+		return fmt.Errorf("unknown repository domain: %s", hostname)
+	}
+	owner, repo, err := github.ParseRepoUrl(pkg.Repository)
+	if err != nil {
+		return fmt.Errorf("failed to parse repo url: %v", err)
+	}
+	version, err := github.GetLatestVersion(owner, repo)
+	if err != nil {
+		return fmt.Errorf("failed to get latest version: %w", err)
+	}
+	pkg.Version = version
+	debug("resolved latest version = %s", version)
+	return nil
 }
 
 // readChecksums reads package asset checksums from the checksum file.

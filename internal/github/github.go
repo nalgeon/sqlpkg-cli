@@ -1,20 +1,40 @@
 package github
 
 import (
+	"errors"
 	"fmt"
+	"net/url"
+	"strings"
 
 	"github.com/nalgeon/sqlpkg-cli/internal/httpx"
 )
 
 const base_url = "https://api.github.com"
 
-type Release struct {
+type release struct {
 	TagName string `json:"tag_name"`
+}
+
+// ParseRepoUrl extracts owner and repo names from the repo url.
+func ParseRepoUrl(repoUrl string) (owner string, repo string, err error) {
+	u, err := url.Parse(repoUrl)
+	if err != nil {
+		err = errors.New(repoUrl)
+		return
+	}
+	parts := strings.Split(strings.Trim(u.Path, "/"), "/")
+	if len(parts) != 2 {
+		err = errors.New(repoUrl)
+		return
+	}
+	owner = parts[0]
+	repo = parts[1]
+	return
 }
 
 func GetLatestVersion(owner, repo string) (string, error) {
 	url := fmt.Sprintf("%s/repos/%s/%s/releases/latest", base_url, owner, repo)
-	rel, err := httpx.GetJSON[Release](url)
+	rel, err := httpx.GetJSON[release](url)
 	if err != nil {
 		return "", err
 	}

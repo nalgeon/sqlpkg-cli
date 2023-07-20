@@ -62,6 +62,11 @@ func installPackage(path string) error {
 		return err
 	}
 
+	err = resolveVersion(pkg)
+	if err != nil {
+		return err
+	}
+
 	if !hasNewVersion(pkg) {
 		log("✓ already at the latest version")
 		return nil

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -145,11 +144,8 @@ func Path(basePath, owner, name string) string {
 
 // inferAssetUrl determines an asset url given the package repository url.
 func inferAssetUrl(repoUrl string) string {
-	url, err := url.Parse(repoUrl)
-	if err != nil {
-		return ""
-	}
-	return downloadBase[url.Hostname()]
+	hostname := httpx.Hostname(repoUrl)
+	return downloadBase[hostname]
 }
 
 // stringFormat formats a string according to the map of values.
