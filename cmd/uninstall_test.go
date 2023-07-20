@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
-	"github.com/nalgeon/sqlpkg-cli/internal/lockfile"
+	"sqlpkg.org/cli/fileio"
+	"sqlpkg.org/cli/lockfile"
 )
 
 func TestUninstall(t *testing.T) {

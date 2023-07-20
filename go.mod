@@ -1,4 +1,4 @@
-module github.com/nalgeon/sqlpkg-cli
+module sqlpkg.org/cli
 
 go 1.20
 

@@ -13,8 +13,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
-	"github.com/nalgeon/sqlpkg-cli/internal/httpx"
+	"sqlpkg.org/cli/fileio"
+	"sqlpkg.org/cli/httpx"
 )
 
 // An Asset is an archive of package files for a specific platform.

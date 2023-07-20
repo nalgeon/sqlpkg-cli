@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/spec"
+	"sqlpkg.org/cli/spec"
 )
 
 const infoHelp = "usage: sqlpkg info package"

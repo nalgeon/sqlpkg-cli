@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/lockfile"
-	"github.com/nalgeon/sqlpkg-cli/internal/spec"
+	"sqlpkg.org/cli/lockfile"
+	"sqlpkg.org/cli/spec"
 )
 
 const updateHelp = "usage: sqlpkg update [package]"

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
-	"github.com/nalgeon/sqlpkg-cli/internal/spec"
+	"sqlpkg.org/cli/fileio"
+	"sqlpkg.org/cli/spec"
 )
 
 const initHelp = "usage: sqlpkg init"

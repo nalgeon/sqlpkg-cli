@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nalgeon/sqlpkg-cli/cmd"
+	"sqlpkg.org/cli/cmd"
 )
 
 var version = "main"

@@ -1,3 +1,4 @@
+// Package cmd implements sqlpkg commands logic.
 package cmd
 
 import (
@@ -8,14 +9,14 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/assets"
-	"github.com/nalgeon/sqlpkg-cli/internal/checksums"
-	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
-	"github.com/nalgeon/sqlpkg-cli/internal/github"
-	"github.com/nalgeon/sqlpkg-cli/internal/httpx"
-	"github.com/nalgeon/sqlpkg-cli/internal/lockfile"
-	"github.com/nalgeon/sqlpkg-cli/internal/spec"
 	"golang.org/x/mod/semver"
+	"sqlpkg.org/cli/assets"
+	"sqlpkg.org/cli/checksums"
+	"sqlpkg.org/cli/fileio"
+	"sqlpkg.org/cli/github"
+	"sqlpkg.org/cli/httpx"
+	"sqlpkg.org/cli/lockfile"
+	"sqlpkg.org/cli/spec"
 )
 
 // workDir is the current working directory.

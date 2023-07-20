@@ -1,7 +1,7 @@
 package lockfile
 
 import (
-	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
+	"sqlpkg.org/cli/fileio"
 )
 
 // ReadLocal reads the lockfile from a local file.

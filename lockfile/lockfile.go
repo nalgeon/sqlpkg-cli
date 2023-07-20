@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/spec"
+	"sqlpkg.org/cli/spec"
 )
 
 // FileName is the lockfile filename.

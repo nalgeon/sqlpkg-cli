@@ -1,3 +1,4 @@
+// Package spec manages the package spec file (sqlpkg.json).
 package spec
 
 import (
@@ -8,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
-	"github.com/nalgeon/sqlpkg-cli/internal/httpx"
+	"sqlpkg.org/cli/fileio"
+	"sqlpkg.org/cli/httpx"
 )
 
 // DirName is the name of the folder with packages

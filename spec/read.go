@@ -1,4 +1,3 @@
-// Package spec manages the package spec file (sqlpkg.json).
 package spec
 
 import (
@@ -6,8 +5,8 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
-	"github.com/nalgeon/sqlpkg-cli/internal/httpx"
+	"sqlpkg.org/cli/fileio"
+	"sqlpkg.org/cli/httpx"
 )
 
 // e.g. github.com/nalgeon/sqlean

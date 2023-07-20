@@ -8,8 +8,8 @@ import (
 	"sort"
 	"text/tabwriter"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/lockfile"
-	"github.com/nalgeon/sqlpkg-cli/internal/spec"
+	"sqlpkg.org/cli/lockfile"
+	"sqlpkg.org/cli/spec"
 )
 
 const listHelp = "usage: sqlpkg list"

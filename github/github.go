@@ -1,3 +1,4 @@
+// Package github works with GitHub repositories.
 package github
 
 import (
@@ -6,7 +7,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/httpx"
+	"sqlpkg.org/cli/httpx"
 )
 
 const Hostname = "github.com"

@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nalgeon/sqlpkg-cli/internal/fileio"
-	"github.com/nalgeon/sqlpkg-cli/internal/httpx"
+	"sqlpkg.org/cli/fileio"
+	"sqlpkg.org/cli/httpx"
 )
 
 // FileName is the checksum filename.
