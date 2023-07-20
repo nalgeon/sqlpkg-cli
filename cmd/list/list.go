@@ -1,4 +1,4 @@
-package cmd
+package list
 
 import (
 	"errors"
@@ -8,6 +8,7 @@ import (
 	"sort"
 	"text/tabwriter"
 
+	"sqlpkg.org/cli/cmd"
 	"sqlpkg.org/cli/lockfile"
 	"sqlpkg.org/cli/spec"
 )
@@ -25,7 +26,7 @@ func List(args []string) error {
 		return err
 	}
 
-	lck, err := readLockfile()
+	lck, err := cmd.ReadLockfile()
 	if err != nil {
 		return err
 	}
@@ -42,7 +43,7 @@ func List(args []string) error {
 
 // gatherPackages collects installed packages.
 func gatherPackages() ([]*spec.Package, error) {
-	pattern := filepath.Join(workDir, spec.DirName, "*", "*", spec.FileName)
+	pattern := filepath.Join(cmd.WorkDir, spec.DirName, "*", "*", spec.FileName)
 	paths, _ := filepath.Glob(pattern)
 
 	packages := []*spec.Package{}
@@ -54,7 +55,7 @@ func gatherPackages() ([]*spec.Package, error) {
 		packages = append(packages, pkg)
 	}
 
-	debug("gathered %d packages", len(packages))
+	cmd.Debug("gathered %d packages", len(packages))
 	return packages, nil
 }
 
@@ -73,12 +74,12 @@ func addMissingToLockfile(lck *lockfile.Lockfile, packages []*spec.Package) erro
 		return nil
 	}
 
-	err := lck.Save(workDir)
+	err := lck.Save(cmd.WorkDir)
 	if err != nil {
 		return fmt.Errorf("failed to save lockfile: %w", err)
 	}
 
-	debug("added %d packages to the lockfile", count)
+	cmd.Debug("added %d packages to the lockfile", count)
 	return nil
 }
 
@@ -91,9 +92,9 @@ func sortPackages(packages []*spec.Package) {
 
 // printPackages prints packages.
 func printPackages(packages []*spec.Package) {
-	printLocalRepo()
+	cmd.PrintLocalRepo()
 	if len(packages) == 0 {
-		log("no packages installed")
+		cmd.Log("no packages installed")
 		return
 	}
 
@@ -102,11 +103,5 @@ func printPackages(packages []*spec.Package) {
 
 	for _, pkg := range packages {
 		fmt.Fprintln(w, pkg.FullName(), "\t", pkg.Description)
-	}
-}
-
-func printLocalRepo() {
-	if workDir == "." {
-		log("(local repository)")
 	}
 }

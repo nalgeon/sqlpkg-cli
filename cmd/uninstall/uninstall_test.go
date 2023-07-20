@@ -1,19 +1,21 @@
-package cmd
+package uninstall
 
 import (
 	"path/filepath"
 	"testing"
 
+	"sqlpkg.org/cli/cmd"
+	"sqlpkg.org/cli/cmd/install"
 	"sqlpkg.org/cli/fileio"
 	"sqlpkg.org/cli/lockfile"
 )
 
 func TestUninstall(t *testing.T) {
-	workDir = "."
-	repoDir, lockPath := setupRepo(t)
-	install(t, repoDir)
+	cmd.WorkDir = "."
+	repoDir, lockPath := cmd.SetupTestRepo(t)
+	installHello(t, repoDir)
 
-	IsVerbose = true
+	cmd.IsVerbose = true
 	args := []string{"asg017/hello"}
 	err := Uninstall(args)
 	if err != nil {
@@ -33,12 +35,12 @@ func TestUninstall(t *testing.T) {
 		t.Fatal("uninstalled package found in the lockfile")
 	}
 
-	teardownRepo(t, repoDir, lockPath)
+	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
-func install(t *testing.T, repoDir string) {
-	args := []string{filepath.Join(workDir, "testdata", "hello.json")}
-	err := Install(args)
+func installHello(t *testing.T, repoDir string) {
+	args := []string{filepath.Join(cmd.WorkDir, "testdata", "hello.json")}
+	err := install.Install(args)
 	if err != nil {
 		t.Fatalf("installation error: %v", err)
 	}

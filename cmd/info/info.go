@@ -1,9 +1,11 @@
-package cmd
+package info
 
 import (
 	"errors"
 	"strings"
 
+	"sqlpkg.org/cli/cmd"
+	"sqlpkg.org/cli/fileio"
 	"sqlpkg.org/cli/spec"
 )
 
@@ -16,45 +18,17 @@ func Info(args []string) error {
 	}
 
 	path := args[0]
-	pkg, err := findSpec(path)
+	pkg, err := cmd.FindSpec(path)
 	if err != nil {
-		debug(err.Error())
-		log("package not found")
+		cmd.Debug(err.Error())
+		cmd.Log("package not found")
 		return nil
 	}
 
 	lines := prepareInfo(pkg)
-	log(strings.Join(lines, "\n"))
+	cmd.Log(strings.Join(lines, "\n"))
 
 	return nil
-}
-
-// findSpec loads the package spec, giving preference to already installed packages.
-func findSpec(path string) (*spec.Package, error) {
-	pkg := readInstalledSpec(path)
-	if pkg != nil {
-		return pkg, nil
-	}
-
-	debug("installed package not found")
-	pkg, err := readSpec(path)
-	return pkg, err
-}
-
-// readInstalledSpec loads the package spec for an installed package (if any).
-func readInstalledSpec(fullName string) *spec.Package {
-	path, err := getPathByFullName(fullName)
-	if err != nil {
-		return nil
-	}
-
-	pkg, err := spec.ReadLocal(path)
-	if err != nil {
-		return nil
-	}
-
-	debug("found installed package")
-	return pkg
 }
 
 // prepareInfo returns detailed package description.
@@ -86,4 +60,10 @@ func prepareInfo(pkg *spec.Package) []string {
 		lines = append(lines, "✘ not installed")
 	}
 	return lines
+}
+
+// isInstalled checks if there is a local package installed.
+func isInstalled(pkg *spec.Package) bool {
+	path := spec.Path(cmd.WorkDir, pkg.Owner, pkg.Name)
+	return fileio.Exists(path)
 }

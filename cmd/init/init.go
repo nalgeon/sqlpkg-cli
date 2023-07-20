@@ -1,10 +1,11 @@
-package cmd
+package init
 
 import (
 	"errors"
 	"fmt"
 	"os"
 
+	"sqlpkg.org/cli/cmd"
 	"sqlpkg.org/cli/fileio"
 	"sqlpkg.org/cli/spec"
 )
@@ -26,6 +27,6 @@ func Init(args []string) error {
 		return fmt.Errorf("failed to create a local repository: %w", err)
 	}
 
-	log("✓ created a local repository")
+	cmd.Log("✓ created a local repository")
 	return nil
 }

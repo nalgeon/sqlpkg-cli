@@ -1,10 +1,11 @@
-package cmd
+package update
 
 import (
 	"errors"
 	"fmt"
 	"path/filepath"
 
+	"sqlpkg.org/cli/cmd"
 	"sqlpkg.org/cli/lockfile"
 	"sqlpkg.org/cli/spec"
 )
@@ -17,9 +18,9 @@ func UpdateAll(args []string) error {
 		return errors.New(updateHelp)
 	}
 
-	printLocalRepo()
+	cmd.PrintLocalRepo()
 
-	pattern := filepath.Join(workDir, spec.DirName, "*", "*", spec.FileName)
+	pattern := filepath.Join(cmd.WorkDir, spec.DirName, "*", "*", spec.FileName)
 	paths, _ := filepath.Glob(pattern)
 
 	if len(paths) == 0 {
@@ -27,7 +28,7 @@ func UpdateAll(args []string) error {
 		return nil
 	}
 
-	lck, err := readLockfile()
+	lck, err := cmd.ReadLockfile()
 	if err != nil {
 		return err
 	}
@@ -36,29 +37,29 @@ func UpdateAll(args []string) error {
 	for _, path := range paths {
 		pkg, err := spec.ReadLocal(path)
 		if err != nil {
-			log("! invalid package %s: %s", path, err)
+			cmd.Log("! invalid package %s: %s", path, err)
 			continue
 		}
 
-		log("> updating %s...", pkg.FullName())
+		cmd.Log("> updating %s...", pkg.FullName())
 		updPkg, err := updatePackage(lck, pkg.FullName())
 		if err != nil {
-			log("! error updating %s: %s", pkg.FullName(), err)
+			cmd.Log("! error updating %s: %s", pkg.FullName(), err)
 			continue
 		}
 		if updPkg == nil {
-			log("✓ already at the latest version")
+			cmd.Log("✓ already at the latest version")
 			continue
 		}
 		updVersion := updPkg.Version
 		if updVersion == "" {
 			updVersion = "latest version"
 		}
-		log("✓ updated package %s to %s", updPkg.FullName(), updVersion)
+		cmd.Log("✓ updated package %s to %s", updPkg.FullName(), updVersion)
 		count += 1
 	}
 
-	log("updated %d packages", count)
+	cmd.Log("updated %d packages", count)
 	return nil
 }
 
@@ -69,7 +70,7 @@ func Update(args []string) error {
 	}
 
 	fullName := args[0]
-	path, err := getPathByFullName(fullName)
+	path, err := cmd.GetPathByFullName(fullName)
 	if err != nil {
 		return err
 	}
@@ -79,23 +80,23 @@ func Update(args []string) error {
 		return fmt.Errorf("invalid package: %w", err)
 	}
 
-	lck, err := readLockfile()
+	lck, err := cmd.ReadLockfile()
 	if err != nil {
 		return err
 	}
 
-	log("> updating %s...", pkg.FullName())
+	cmd.Log("> updating %s...", pkg.FullName())
 	updPkg, err := updatePackage(lck, pkg.FullName())
 	if err != nil {
 		return fmt.Errorf("failed to update: %w", err)
 	}
 
 	if updPkg == nil {
-		log("✓ already at the latest version")
+		cmd.Log("✓ already at the latest version")
 		return nil
 	}
 
-	log("✓ updated package %s to %s", updPkg.FullName(), updPkg.Version)
+	cmd.Log("✓ updated package %s to %s", updPkg.FullName(), updPkg.Version)
 	return nil
 }
 
@@ -103,56 +104,56 @@ func Update(args []string) error {
 // Returns true if the package was actually updated, false otherwise
 // (already at the latest version or encountered an error).
 func updatePackage(lck *lockfile.Lockfile, fullName string) (*spec.Package, error) {
-	pkg, err := readSpec(fullName)
+	pkg, err := cmd.ReadSpec(fullName)
 	if err != nil {
 		return nil, err
 	}
 
-	err = resolveVersion(pkg)
+	err = cmd.ResolveVersion(pkg)
 	if err != nil {
 		return nil, err
 	}
 
-	if !hasNewVersion(pkg) {
+	if !cmd.HasNewVersion(pkg) {
 		return nil, nil
 	}
 
-	err = readChecksums(pkg)
+	err = cmd.ReadChecksums(pkg)
 	if err != nil {
 		return nil, err
 	}
 
-	assetUrl, err := buildAssetPath(pkg)
+	assetUrl, err := cmd.BuildAssetPath(pkg)
 	if err != nil {
 		return nil, err
 	}
 
-	asset, err := downloadAsset(pkg, assetUrl)
+	asset, err := cmd.DownloadAsset(pkg, assetUrl)
 	if err != nil {
 		return nil, err
 	}
 
-	err = validateAsset(pkg, asset)
+	err = cmd.ValidateAsset(pkg, asset)
 	if err != nil {
 		return nil, err
 	}
 
-	err = unpackAsset(pkg, asset)
+	err = cmd.UnpackAsset(pkg, asset)
 	if err != nil {
 		return nil, err
 	}
 
-	err = installFiles(pkg, asset)
+	err = cmd.InstallFiles(pkg, asset)
 	if err != nil {
 		return nil, err
 	}
 
-	err = dequarantineFiles(pkg)
+	err = cmd.DequarantineFiles(pkg)
 	if err != nil {
 		return nil, err
 	}
 
-	err = addToLockfile(lck, pkg)
+	err = cmd.AddToLockfile(lck, pkg)
 	if err != nil {
 		return nil, err
 	}

@@ -7,42 +7,56 @@ import (
 	"os"
 
 	"sqlpkg.org/cli/cmd"
+	"sqlpkg.org/cli/cmd/help"
+	"sqlpkg.org/cli/cmd/info"
+	init_ "sqlpkg.org/cli/cmd/init"
+	"sqlpkg.org/cli/cmd/install"
+	"sqlpkg.org/cli/cmd/list"
+	"sqlpkg.org/cli/cmd/uninstall"
+	"sqlpkg.org/cli/cmd/update"
 )
 
 var version = "main"
 
-func execCommand() error {
+func parseArgs() (command string, args []string) {
 	if len(os.Args) < 2 {
-		return cmd.Help(nil)
+		return "", nil
 	}
 
 	flag.BoolVar(&cmd.IsVerbose, "v", false, "verbose output")
 	flag.Parse()
 
-	args := flag.Args()
-	command, args := args[0], args[1:]
+	args = flag.Args()
+	command, args = args[0], args[1:]
+	return
+}
+
+func execCommand(command string, args []string) error {
+	if command == "" {
+		return help.Help(nil)
+	}
 
 	switch command {
 	case "init":
-		return cmd.Init(args)
+		return init_.Init(args)
 	case "install":
 		if len(args) == 0 {
-			return cmd.InstallAll(args)
+			return install.InstallAll(args)
 		}
-		return cmd.Install(args)
+		return install.Install(args)
 	case "uninstall":
-		return cmd.Uninstall(args)
+		return uninstall.Uninstall(args)
 	case "update":
 		if len(args) == 0 {
-			return cmd.UpdateAll(args)
+			return update.UpdateAll(args)
 		}
-		return cmd.Update(args)
+		return update.Update(args)
 	case "list":
-		return cmd.List(args)
+		return list.List(args)
 	case "info":
-		return cmd.Info(args)
+		return info.Info(args)
 	case "help":
-		return cmd.Help(args)
+		return help.Help(args)
 	case "version":
 		fmt.Println(version)
 		return nil
@@ -52,7 +66,8 @@ func execCommand() error {
 }
 
 func main() {
-	err := execCommand()
+	command, args := parseArgs()
+	err := execCommand(command, args)
 	if err != nil {
 		fmt.Println("!", err)
 		os.Exit(1)

@@ -1,9 +1,10 @@
-package cmd
+package install
 
 import (
 	"errors"
 	"fmt"
 
+	"sqlpkg.org/cli/cmd"
 	"sqlpkg.org/cli/spec"
 )
 
@@ -11,16 +12,16 @@ const installHelp = "usage: sqlpkg install [package]"
 
 // InstallAll installs all packages from the lockfile.
 func InstallAll(args []string) error {
-	printLocalRepo()
+	cmd.PrintLocalRepo()
 
-	lck, err := readLockfile()
+	lck, err := cmd.ReadLockfile()
 	if err != nil {
 		return err
 	}
-	debug("loaded the lockfile with %d packages", len(lck.Packages))
+	cmd.Debug("loaded the lockfile with %d packages", len(lck.Packages))
 
 	if len(lck.Packages) == 0 {
-		log("no packages found in the lockfile")
+		cmd.Log("no packages found in the lockfile")
 		return nil
 	}
 
@@ -29,14 +30,14 @@ func InstallAll(args []string) error {
 		err = installLockedPackage(pkg)
 		if err != nil {
 			errCount += 1
-			log("! %s", err)
+			cmd.Log("! %s", err)
 		}
 	}
 
 	if errCount > 0 {
 		return fmt.Errorf("failed to install %d packages", errCount)
 	}
-	log("installed %d packages", len(lck.Packages))
+	cmd.Log("installed %d packages", len(lck.Packages))
 	return nil
 }
 
@@ -46,7 +47,7 @@ func Install(args []string) error {
 		return errors.New(installHelp)
 	}
 
-	printLocalRepo()
+	cmd.PrintLocalRepo()
 
 	path := args[0]
 	err := installPackage(path)
@@ -55,70 +56,70 @@ func Install(args []string) error {
 
 // installPackage installs a package using a specfile from a given path.
 func installPackage(path string) error {
-	log("> installing %s...", path)
+	cmd.Log("> installing %s...", path)
 
-	pkg, err := readSpec(path)
+	pkg, err := cmd.ReadSpec(path)
 	if err != nil {
 		return err
 	}
 
-	err = resolveVersion(pkg)
+	err = cmd.ResolveVersion(pkg)
 	if err != nil {
 		return err
 	}
 
-	if !hasNewVersion(pkg) {
-		log("✓ already at the latest version")
+	if !cmd.HasNewVersion(pkg) {
+		cmd.Log("✓ already at the latest version")
 		return nil
 	}
 
-	err = readChecksums(pkg)
+	err = cmd.ReadChecksums(pkg)
 	if err != nil {
 		return err
 	}
 
-	assetPath, err := buildAssetPath(pkg)
+	assetPath, err := cmd.BuildAssetPath(pkg)
 	if err != nil {
 		return err
 	}
 
-	asset, err := downloadAsset(pkg, assetPath)
+	asset, err := cmd.DownloadAsset(pkg, assetPath)
 	if err != nil {
 		return err
 	}
 
-	err = validateAsset(pkg, asset)
+	err = cmd.ValidateAsset(pkg, asset)
 	if err != nil {
 		return err
 	}
 
-	err = unpackAsset(pkg, asset)
+	err = cmd.UnpackAsset(pkg, asset)
 	if err != nil {
 		return err
 	}
 
-	err = installFiles(pkg, asset)
+	err = cmd.InstallFiles(pkg, asset)
 	if err != nil {
 		return err
 	}
 
-	err = dequarantineFiles(pkg)
+	err = cmd.DequarantineFiles(pkg)
 	if err != nil {
 		return err
 	}
 
-	lck, err := readLockfile()
+	lck, err := cmd.ReadLockfile()
 	if err != nil {
 		return err
 	}
 
-	err = addToLockfile(lck, pkg)
+	err = cmd.AddToLockfile(lck, pkg)
 	if err != nil {
 		return err
 	}
 
-	dir := spec.Dir(workDir, pkg.Owner, pkg.Name)
-	log("✓ installed package %s to %s", pkg.FullName(), dir)
+	dir := spec.Dir(cmd.WorkDir, pkg.Owner, pkg.Name)
+	cmd.Log("✓ installed package %s to %s", pkg.FullName(), dir)
 	return nil
 }
 
@@ -126,53 +127,53 @@ func installPackage(path string) error {
 func installLockedPackage(lckPkg *spec.Package) error {
 	path := lckPkg.Specfile
 	if path == "" {
-		debug("missing specfile for %s, falling back to name/owner", lckPkg.FullName())
+		cmd.Debug("missing specfile for %s, falling back to name/owner", lckPkg.FullName())
 		path = lckPkg.FullName()
 	}
 
-	log("> installing %s...", path)
+	cmd.Log("> installing %s...", path)
 
-	pkg, err := readSpec(path)
+	pkg, err := cmd.ReadSpec(path)
 	if err != nil {
 		return err
 	}
 
 	// lock the version
-	debug("locked version = %s", lckPkg.Version)
+	cmd.Debug("locked version = %s", lckPkg.Version)
 	pkg.Version = lckPkg.Version
 	pkg.Assets = lckPkg.Assets
 
-	if !hasNewVersion(pkg) {
-		log("✓ already at the %s version", pkg.Version)
+	if !cmd.HasNewVersion(pkg) {
+		cmd.Log("✓ already at the %s version", pkg.Version)
 		return nil
 	}
 
-	assetPath, err := buildAssetPath(pkg)
+	assetPath, err := cmd.BuildAssetPath(pkg)
 	if err != nil {
 		return err
 	}
 
-	asset, err := downloadAsset(pkg, assetPath)
+	asset, err := cmd.DownloadAsset(pkg, assetPath)
 	if err != nil {
 		return err
 	}
 
-	err = validateAsset(pkg, asset)
+	err = cmd.ValidateAsset(pkg, asset)
 	if err != nil {
 		return err
 	}
 
-	err = unpackAsset(pkg, asset)
+	err = cmd.UnpackAsset(pkg, asset)
 	if err != nil {
 		return err
 	}
 
-	err = installFiles(pkg, asset)
+	err = cmd.InstallFiles(pkg, asset)
 	if err != nil {
 		return err
 	}
 
-	err = dequarantineFiles(pkg)
+	err = cmd.DequarantineFiles(pkg)
 	if err != nil {
 		return err
 	}
@@ -180,7 +181,7 @@ func installLockedPackage(lckPkg *spec.Package) error {
 	// no need to add the package to the lockfile,
 	// it's already there
 
-	dir := spec.Dir(workDir, pkg.Owner, pkg.Name)
-	log("✓ installed package %s to %s", pkg.FullName(), dir)
+	dir := spec.Dir(cmd.WorkDir, pkg.Owner, pkg.Name)
+	cmd.Log("✓ installed package %s to %s", pkg.FullName(), dir)
 	return nil
 }
