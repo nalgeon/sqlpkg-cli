@@ -178,7 +178,7 @@ func validatePackage(t *testing.T, repoDir, lockPath, owner, name string) {
 	}
 
 	pkg := lck.Packages["nalgeon/example"]
-	if !strings.HasPrefix(pkg.Specfile, "./testdata/") || !strings.HasSuffix(pkg.Specfile, "sqlpkg.json") {
+	if !strings.HasPrefix(pkg.Specfile, "testdata/") || !strings.HasSuffix(pkg.Specfile, "sqlpkg.json") {
 		t.Fatalf("unexpected specfile: %v", pkg.Specfile)
 	}
 

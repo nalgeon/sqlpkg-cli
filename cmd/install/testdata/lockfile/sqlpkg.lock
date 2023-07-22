@@ -4,9 +4,9 @@
             "owner": "nalgeon",
             "name": "example",
             "version": "0.1.0",
-            "specfile": "./testdata/lockfile/sqlpkg.json",
+            "specfile": "testdata/lockfile/sqlpkg.json",
             "assets": {
-                "path": "./testdata/lockfile",
+                "path": "testdata/lockfile",
                 "files": {
                     "darwin-amd64": "example-macos-0.1.0-x86.zip",
                     "darwin-arm64": "example-macos-0.1.0-arm64.zip",

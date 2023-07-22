@@ -9,7 +9,7 @@
     "description": "Example extension.",
     "keywords": ["sqlite-example"],
     "assets": {
-        "path": "./testdata/installed",
+        "path": "testdata/installed",
         "files": {
             "darwin-amd64": "example-macos-{version}-x86.zip",
             "darwin-arm64": "example-macos-{version}-arm64.zip",

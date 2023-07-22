@@ -3,7 +3,7 @@
     "name": "example",
     "version": "",
     "assets": {
-        "path": "./testdata/unsupported",
+        "path": "testdata/unsupported",
         "files": {
             "windows-amd64": "example.dll"
         }

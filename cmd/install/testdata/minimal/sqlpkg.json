@@ -3,7 +3,7 @@
     "name": "example",
     "version": "",
     "assets": {
-        "path": "./testdata/minimal",
+        "path": "testdata/minimal",
         "files": {
             "darwin-amd64": "example.dylib",
             "darwin-arm64": "example.dylib",

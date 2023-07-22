@@ -4,7 +4,7 @@
             "owner": "nalgeon",
             "name": "example",
             "version": "0.1.0",
-            "specfile": "./testdata/latest/remote/sqlpkg.json",
+            "specfile": "testdata/latest/remote/sqlpkg.json",
             "assets": {
                 "path": "https://github.com/nalgeon/sqlite-example/releases/download/0.1.0",
                 "files": {

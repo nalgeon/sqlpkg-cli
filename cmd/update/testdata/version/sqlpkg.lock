@@ -4,9 +4,9 @@
             "owner": "nalgeon",
             "name": "example",
             "version": "",
-            "specfile": "./testdata/version/remote/sqlpkg.json",
+            "specfile": "testdata/version/remote/sqlpkg.json",
             "assets": {
-                "path": "./testdata/version/remote/",
+                "path": "testdata/version/remote/",
                 "files": {
                     "darwin-amd64": "example.dylib",
                     "darwin-arm64": "example.dylib",

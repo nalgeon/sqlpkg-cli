@@ -4,7 +4,7 @@
     "version": "0.1.0",
     "homepage": "https://github.com/nalgeon/sqlite-example/blob/main/README.md",
     "repository": "https://github.com/nalgeon/sqlite-example",
-    "specfile": "./testdata/checksum/remote/sqlpkg.json",
+    "specfile": "testdata/checksum/remote/sqlpkg.json",
     "authors": ["Anton Zhiyanov"],
     "license": "MIT",
     "description": "Example extension.",
