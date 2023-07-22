@@ -8,13 +8,12 @@ import (
 	"sqlpkg.org/cli/cmd"
 	"sqlpkg.org/cli/fileio"
 	"sqlpkg.org/cli/lockfile"
-	"sqlpkg.org/cli/logx"
 )
 
 func TestFull(t *testing.T) {
 	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
-	memory := cmd.SetupTestLogger()
+	mem := cmd.SetupTestLogger()
 
 	args := []string{filepath.Join(cmd.WorkDir, "testdata", "full", "sqlpkg.json")}
 	err := Install(args)
@@ -22,7 +21,40 @@ func TestFull(t *testing.T) {
 		t.Fatalf("installation error: %v", err)
 	}
 
-	validateLog(t, memory)
+	mem.Print()
+	mem.MustHave(t, "installing testdata/full/sqlpkg.json")
+	mem.MustHave(t, "read package nalgeon/example, version = 0.1.0")
+	mem.MustHave(t, "read 4 checksums")
+	mem.MustHave(t, "downloaded example-")
+	mem.MustHave(t, "asset checksum is valid")
+	mem.MustHave(t, "unpacked 1 files")
+	mem.MustHave(t, "created new lockfile")
+	mem.MustHave(t, "added package to the lockfile")
+	mem.MustHave(t, "installed package nalgeon/example")
+
+	validatePackage(t, repoDir, lockPath, "nalgeon", "example")
+
+	cmd.TeardownTestRepo(t, repoDir, lockPath)
+}
+
+func TestLockfile(t *testing.T) {
+	cmd.WorkDir = "."
+	repoDir, lockPath := cmd.SetupTestRepo(t)
+	cmd.CopyTestRepo(t, "lockfile")
+	mem := cmd.SetupTestLogger()
+
+	args := []string{}
+	err := InstallAll(args)
+	if err != nil {
+		t.Fatalf("installation error: %v", err)
+	}
+
+	mem.Print()
+	mem.MustHave(t, "loaded the lockfile with 1 packages")
+	mem.MustHave(t, "read package nalgeon/example, version = 0.2.0")
+	mem.MustHave(t, "locked version = 0.1.0")
+	mem.MustHave(t, "installed package nalgeon/example")
+
 	validatePackage(t, repoDir, lockPath, "nalgeon", "example")
 
 	cmd.TeardownTestRepo(t, repoDir, lockPath)
@@ -120,19 +152,6 @@ func TestUnknown(t *testing.T) {
 	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
-func validateLog(t *testing.T, mem *logx.Memory) {
-	mem.Print()
-	mem.MustHave(t, "installing testdata/full/sqlpkg.json")
-	mem.MustHave(t, "read package nalgeon/example, version = 0.1.0")
-	mem.MustHave(t, "read 4 checksums")
-	mem.MustHave(t, "downloaded example-")
-	mem.MustHave(t, "asset checksum is valid")
-	mem.MustHave(t, "unpacked 1 files")
-	mem.MustHave(t, "created new lockfile")
-	mem.MustHave(t, "added package to the lockfile")
-	mem.MustHave(t, "installed package nalgeon/example")
-}
-
 func validatePackage(t *testing.T, repoDir, lockPath, owner, name string) {
 	pkgDir := filepath.Join(repoDir, owner, name)
 
@@ -159,7 +178,7 @@ func validatePackage(t *testing.T, repoDir, lockPath, owner, name string) {
 	}
 
 	pkg := lck.Packages["nalgeon/example"]
-	if pkg.Specfile != "testdata/full/sqlpkg.json" {
+	if !strings.HasPrefix(pkg.Specfile, "./testdata/") || !strings.HasSuffix(pkg.Specfile, "sqlpkg.json") {
 		t.Fatalf("unexpected specfile: %v", pkg.Specfile)
 	}
 
