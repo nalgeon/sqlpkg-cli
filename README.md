@@ -61,6 +61,49 @@ For example, given the user `anton` and the package `nalgeon/stats`, the locatio
 -   `/home/anton/.sqlpkg/nalgeon/stats/stats.so` on Linux
 -   `/Users/anton/.sqlpkg/nalgeon/stats/stats.dylib` on macOS
 
+This is what it looks like:
+
+```
+sqlpkg install nalgeon/stats
+> installing nalgeon/stats...
+✓ installed package nalgeon/stats to /Users/anton/.sqlpkg/nalgeon/stats
+```
+
+```
+sqlpkg install asg017/hello
+> installing asg017/hello...
+✓ installed package asg017/hello to /Users/anton/.sqlpkg/asg017/hello
+```
+
+```
+.sqlpkg
+├── asg017
+│   └── hello
+│       ├── hello0.dylib
+│       ├── hola0.dylib
+│       └── sqlpkg.json
+└── nalgeon
+    └── stats
+        ├── sqlpkg.json
+        └── stats.dylib
+```
+
+## Loading installed extensions in SQLite
+
+To load an extension, you'll need the path to the extension file. Run the `which` command to see it:
+
+```
+sqlpkg which nalgeon/stats
+```
+
+```
+/Users/anton/.sqlpkg/nalgeon/stats/stats.dylib
+```
+
+Use this path to load the extension with a `.load` shell command, a `load_extension()` SQL function, or other means. See this guide for details:
+
+[How to Install an SQLite Extension](https://antonz.org/install-sqlite-extension/)
+
 ## Other commands
 
 `sqlpkg` provides other basic commands you would expect from a package manager.
@@ -121,7 +164,7 @@ It will create an `.sqlpkg` folder in the current directory. After that, all oth
 
 The package spec file describes a particular package so that `sqlpkg` can work with it. It is usually created by the package author, so if you are a `sqlpkg` user, you don't need to worry about that.
 
-If you _are_ a package author, who wants your package to be installable by `sqlpkg`, learn how to create a spec file using [this guide](docs/spec-file.md) (coming soon).
+If you _are_ a package author, who wants your package to be installable by `sqlpkg`, learn how to create a spec file using [this guide](docs/spec-file.md).
 
 ## Lockfile
 
