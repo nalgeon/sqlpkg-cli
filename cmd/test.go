@@ -25,16 +25,20 @@ func SetupTestRepo(t *testing.T) (string, string) {
 	return repoDir, lockPath
 }
 
-func CopyTestRepo(t *testing.T) {
+func CopyTestRepo(t *testing.T, name string) {
+	basePath := filepath.Join("testdata", name)
+
 	{
-		cmd := []string{"cp", "-r", "./testdata/.sqlpkg", "."}
+		path := filepath.Join(basePath, ".sqlpkg")
+		cmd := []string{"cp", "-r", path, "."}
 		err := exec.Command(cmd[0], cmd[1:]...).Run()
 		if err != nil {
 			t.Fatalf("%s: %v", strings.Join(cmd, " "), err)
 		}
 	}
 	{
-		cmd := []string{"cp", "./testdata/sqlpkg.lock", "."}
+		path := filepath.Join(basePath, "sqlpkg.lock")
+		cmd := []string{"cp", path, "."}
 		err := exec.Command(cmd[0], cmd[1:]...).Run()
 		if err != nil {
 			t.Fatalf("%s: %v", strings.Join(cmd, " "), err)

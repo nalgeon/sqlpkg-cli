@@ -1,0 +1,11 @@
+{
+    "owner": "nalgeon",
+    "name": "example",
+    "version": "",
+    "assets": {
+        "path": "./testdata/unsupported",
+        "files": {
+            "windows-amd64": "example.dll"
+        }
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "owner": "nalgeon",
+    "name": "example",
+    "version": "",
+    "assets": {
+        "path": "./testdata/checksum",
+        "files": {
+            "darwin-amd64": "example.dylib",
+            "darwin-arm64": "example.dylib",
+            "linux-amd64": "example.so",
+            "windows-amd64": "example.dll"
+        }
+    }
+}

@@ -14,7 +14,7 @@ import (
 func TestUpdate(t *testing.T) {
 	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
-	cmd.CopyTestRepo(t)
+	cmd.CopyTestRepo(t, "")
 
 	memory := cmd.SetupTestLogger()
 
@@ -33,7 +33,7 @@ func TestUpdate(t *testing.T) {
 func TestUpdateAll(t *testing.T) {
 	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
-	cmd.CopyTestRepo(t)
+	cmd.CopyTestRepo(t, "")
 
 	memory := cmd.SetupTestLogger()
 

@@ -13,7 +13,7 @@ import (
 func TestUninstall(t *testing.T) {
 	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
-	cmd.CopyTestRepo(t)
+	cmd.CopyTestRepo(t, "")
 
 	memory := cmd.SetupTestLogger()
 
