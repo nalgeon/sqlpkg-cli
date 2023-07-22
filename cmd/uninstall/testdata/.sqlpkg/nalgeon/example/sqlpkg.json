@@ -1,0 +1,27 @@
+{
+    "owner": "nalgeon",
+    "name": "example",
+    "version": "0.1.0",
+    "homepage": "https://github.com/nalgeon/sqlite-example/blob/main/README.md",
+    "repository": "https://github.com/nalgeon/sqlite-example",
+    "specfile": "https://github.com/nalgeon/sqlite-example/raw/main/sqlpkg.json",
+    "authors": ["Anton Zhiyanov"],
+    "license": "MIT",
+    "description": "Example extension.",
+    "keywords": ["sqlite-example"],
+    "assets": {
+        "path": "https://github.com/nalgeon/sqlite-example/releases/download/0.1.0",
+        "files": {
+            "darwin-amd64": "example-macos-0.1.0-x86.zip",
+            "darwin-arm64": "example-macos-0.1.0-arm64.zip",
+            "linux-amd64": "example-linux-0.1.0-x86.zip",
+            "windows-amd64": "example-win-0.1.0-x64.zip"
+        },
+        "checksums": {
+            "example-macos-0.1.0-x86.zip": "sha256-e3de533fdc23e0d953572c2b544ecc2951b890758af0a00b5a42695ae59ee7ac",
+            "example-macos-0.1.0-arm64.zip": "sha256-e3de533fdc23e0d953572c2b544ecc2951b890758af0a00b5a42695ae59ee7ac",
+            "example-linux-0.1.0-x86.zip": "sha256-6bc24897dde2c7f00cf435055a6853358cb06fcb5a2a789877903ebec0b9298d",
+            "example-win-0.1.0-x64.zip": "sha256-f0d2d705bbe641bf2950a51253820e85de04373b7f428f109f69df1d85fa0654"
+        }
+    }
+}

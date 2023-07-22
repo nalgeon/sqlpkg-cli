@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"sqlpkg.org/cli/cmd"
-	"sqlpkg.org/cli/cmd/install"
 	"sqlpkg.org/cli/fileio"
 	"sqlpkg.org/cli/lockfile"
 )
@@ -13,16 +12,16 @@ import (
 func TestUninstall(t *testing.T) {
 	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
-	installHello(t, repoDir)
+	cmd.CopyTestRepo(t)
 
 	cmd.IsVerbose = true
-	args := []string{"asg017/hello"}
+	args := []string{"nalgeon/example"}
 	err := Uninstall(args)
 	if err != nil {
 		t.Fatalf("uninstallation error: %v", err)
 	}
 
-	pkgDir := filepath.Join(repoDir, "asg017", "hello")
+	pkgDir := filepath.Join(repoDir, "nalgeon", "example")
 	if fileio.Exists(pkgDir) {
 		t.Fatalf("package dir still exists: %v", pkgDir)
 	}
@@ -31,17 +30,9 @@ func TestUninstall(t *testing.T) {
 	if err != nil {
 		t.Fatal("failed to read lockfile")
 	}
-	if lck.Has("asg017/hello") {
+	if lck.Has("nalgeon/example") {
 		t.Fatal("uninstalled package found in the lockfile")
 	}
 
 	cmd.TeardownTestRepo(t, repoDir, lockPath)
-}
-
-func installHello(t *testing.T, repoDir string) {
-	args := []string{filepath.Join(cmd.WorkDir, "testdata", "hello.json")}
-	err := install.Install(args)
-	if err != nil {
-		t.Fatalf("installation error: %v", err)
-	}
 }
