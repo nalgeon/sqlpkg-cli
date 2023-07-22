@@ -9,14 +9,15 @@ import (
 	"sqlpkg.org/cli/fileio"
 	"sqlpkg.org/cli/lockfile"
 	"sqlpkg.org/cli/logx"
+	"sqlpkg.org/cli/spec"
 )
 
 func TestUpdate(t *testing.T) {
 	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
-	cmd.CopyTestRepo(t, "")
+	cmd.CopyTestRepo(t, "success")
 
-	memory := cmd.SetupTestLogger()
+	mem := cmd.SetupTestLogger()
 
 	args := []string{"nalgeon/example"}
 	err := Update(args)
@@ -24,7 +25,7 @@ func TestUpdate(t *testing.T) {
 		t.Fatalf("update error: %v", err)
 	}
 
-	validateLog(t, memory)
+	validateLog(t, mem)
 	validatePackage(t, repoDir, lockPath, "nalgeon", "example")
 
 	cmd.TeardownTestRepo(t, repoDir, lockPath)
@@ -33,9 +34,9 @@ func TestUpdate(t *testing.T) {
 func TestUpdateAll(t *testing.T) {
 	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
-	cmd.CopyTestRepo(t, "")
+	cmd.CopyTestRepo(t, "success")
 
-	memory := cmd.SetupTestLogger()
+	mem := cmd.SetupTestLogger()
 
 	args := []string{}
 	err := UpdateAll(args)
@@ -43,9 +44,73 @@ func TestUpdateAll(t *testing.T) {
 		t.Fatalf("update error: %v", err)
 	}
 
-	validateLog(t, memory)
-	memory.MustHave(t, "updated 1 packages")
+	validateLog(t, mem)
+	mem.MustHave(t, "updated 1 packages")
 	validatePackage(t, repoDir, lockPath, "nalgeon", "example")
+
+	cmd.TeardownTestRepo(t, repoDir, lockPath)
+}
+
+func TestLatest(t *testing.T) {
+	cmd.WorkDir = "."
+	repoDir, lockPath := cmd.SetupTestRepo(t)
+	cmd.CopyTestRepo(t, "latest")
+
+	mem := cmd.SetupTestLogger()
+
+	args := []string{"nalgeon/example"}
+	err := Update(args)
+	if err != nil {
+		t.Fatalf("update error: %v", err)
+	}
+
+	mem.Print()
+	mem.MustHave(t, "already at the latest version")
+
+	pkg, err := spec.ReadLocal(spec.Path(cmd.WorkDir, "nalgeon", "example"))
+	if err != nil {
+		t.Fatalf("read pkg error: %v", err)
+	}
+	if pkg.Version != "0.1.0" {
+		t.Fatalf("unexpected version: %v", pkg.Version)
+	}
+
+	cmd.TeardownTestRepo(t, repoDir, lockPath)
+}
+
+func TestNoVersion(t *testing.T) {
+	cmd.WorkDir = "."
+	repoDir, lockPath := cmd.SetupTestRepo(t)
+	cmd.CopyTestRepo(t, "version")
+
+	mem := cmd.SetupTestLogger()
+
+	args := []string{"nalgeon/example"}
+	err := Update(args)
+	if err != nil {
+		t.Fatalf("update error: %v", err)
+	}
+
+	mem.Print()
+	mem.MustHave(t, "added package to the lockfile")
+	mem.MustHave(t, "updated package nalgeon/example")
+
+	cmd.TeardownTestRepo(t, repoDir, lockPath)
+}
+
+func TestInvalidChecksum(t *testing.T) {
+	cmd.WorkDir = "."
+	repoDir, lockPath := cmd.SetupTestRepo(t)
+	cmd.CopyTestRepo(t, "checksum")
+
+	args := []string{"nalgeon/example"}
+	err := Update(args)
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+	if !strings.Contains(err.Error(), "asset checksum is invalid") {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
