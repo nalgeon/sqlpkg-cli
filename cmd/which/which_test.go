@@ -20,7 +20,7 @@ func TestExact(t *testing.T) {
 	}
 
 	mem.Print()
-	mem.MustHave(t, ".sqlpkg/nalgeon/example/example.dylib")
+	mem.MustHave(t, ".sqlpkg/nalgeon/example/example")
 
 	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
@@ -39,7 +39,7 @@ func TestPossible(t *testing.T) {
 
 	mem.Print()
 	mem.MustHave(t, "exact match not found")
-	mem.MustHave(t, ".sqlpkg/sqlite/stmt/stmtvtab.dylib")
+	mem.MustHave(t, ".sqlpkg/sqlite/stmt/stmtvtab")
 
 	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
