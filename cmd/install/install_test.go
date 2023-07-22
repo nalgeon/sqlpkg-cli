@@ -13,9 +13,10 @@ func TestInstall(t *testing.T) {
 	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
 
-	pkgDir := filepath.Join(repoDir, "asg017", "hello")
-	args := []string{filepath.Join(cmd.WorkDir, "testdata", "hello.json")}
+	pkgDir := filepath.Join(repoDir, "nalgeon", "example")
+	args := []string{filepath.Join(cmd.WorkDir, "testdata", "sqlpkg.json")}
 	cmd.IsVerbose = true
+
 	err := Install(args)
 	if err != nil {
 		t.Fatalf("installation error: %v", err)
@@ -30,7 +31,7 @@ func TestInstall(t *testing.T) {
 		t.Fatalf("spec file does not exist: %v", specPath)
 	}
 
-	assets, _ := filepath.Glob(filepath.Join(pkgDir, "hello0.*"))
+	assets, _ := filepath.Glob(filepath.Join(pkgDir, "example.*"))
 	if len(assets) == 0 {
 		t.Fatal("asset files do not exist")
 	}
@@ -39,15 +40,18 @@ func TestInstall(t *testing.T) {
 	if err != nil {
 		t.Fatal("failed to read lockfile")
 	}
-	if !lck.Has("asg017/hello") {
+	if !lck.Has("nalgeon/example") {
 		t.Fatal("installed package not found in the lockfile")
 	}
 
-	pkg := lck.Packages["asg017/hello"]
+	pkg := lck.Packages["nalgeon/example"]
 	nAssets := len(pkg.Assets.Files)
 	nChecksums := len(pkg.Assets.Checksums)
 	if nChecksums != nAssets {
 		t.Fatalf("got %d checksums, want %d", nChecksums, nAssets)
+	}
+	if pkg.Assets.Files["linux-amd64"] != "example-linux-0.1.0-x86.zip" {
+		t.Fatalf("unexpected linux asset: %s", pkg.Assets.Files["linux-amd64"])
 	}
 
 	cmd.TeardownTestRepo(t, repoDir, lockPath)
