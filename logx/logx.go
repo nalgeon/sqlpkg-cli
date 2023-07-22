@@ -52,6 +52,11 @@ func SetVerbose(val bool) {
 	logger.IsVerbose = val
 }
 
+// Output returns the logger destination.
+func Output() io.Writer {
+	return logger.out
+}
+
 // SetOutput changes the logger destination.
 func SetOutput(out io.Writer) {
 	logger.out = out

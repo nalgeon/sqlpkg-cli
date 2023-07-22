@@ -3,7 +3,6 @@ package help
 import (
 	"errors"
 	"fmt"
-	"os"
 	"text/tabwriter"
 
 	"sqlpkg.org/cli/logx"
@@ -32,9 +31,10 @@ func Help(args []string) error {
 		return errors.New(helpHelp)
 	}
 
-	logx.Log("`sqlpkg` is an SQLite package manager. Use it to install or update SQLite extensions.\n")
-	logx.Log("Commands:")
-	w := tabwriter.NewWriter(os.Stdout, 0, 4, 0, ' ', 0)
+	logx.Log(`sqlpkg is an SQLite package manager.
+Use it to install or update SQLite extensions.`)
+	logx.Log("\nCommands:")
+	w := tabwriter.NewWriter(logx.Output(), 0, 4, 0, ' ', 0)
 	for _, cmd := range commands {
 		fmt.Fprintln(w, cmd, "\t", commandsHelp[cmd])
 	}

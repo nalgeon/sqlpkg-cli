@@ -1,0 +1,19 @@
+{
+    "owner": "sqlite",
+    "name": "stmt",
+    "homepage": "https://www.sqlite.org/stmt.html",
+    "repository": "https://sqlite.org/src/file/ext/misc/",
+    "authors": ["Richard Hipp"],
+    "license": "Public Domain",
+    "description": "Natural string sorting and comparison.",
+    "symbols": ["sqlite_stmt"],
+    "assets": {
+        "path": "https://github.com/nalgeon/sqlean/releases/download/incubator",
+        "files": {
+            "darwin-amd64": "stmt.dylib",
+            "darwin-arm64": "stmt.dylib",
+            "linux-amd64": "stmt.so",
+            "windows-amd64": "stmt.dll"
+        }
+    }
+}
