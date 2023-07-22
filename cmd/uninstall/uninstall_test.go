@@ -2,6 +2,7 @@ package uninstall
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"sqlpkg.org/cli/cmd"
@@ -25,6 +26,24 @@ func TestUninstall(t *testing.T) {
 
 	validateLog(t, memory)
 	validatePackage(t, repoDir, lockPath, "nalgeon", "example")
+
+	cmd.TeardownTestRepo(t, repoDir, lockPath)
+}
+
+func TestUnknown(t *testing.T) {
+	cmd.WorkDir = "."
+	repoDir, lockPath := cmd.SetupTestRepo(t)
+	cmd.CopyTestRepo(t, "")
+	cmd.SetupTestLogger()
+
+	args := []string{"sqlite/unknown"}
+	err := Uninstall(args)
+	if err == nil {
+		t.Fatalf("expected error, got nil")
+	}
+	if !strings.Contains(err.Error(), "package is not installed") {
+		t.Fatalf("unexpected error: %v", err)
+	}
 
 	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
