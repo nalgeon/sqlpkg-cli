@@ -13,6 +13,7 @@ import (
 	"sqlpkg.org/cli/cmd/list"
 	"sqlpkg.org/cli/cmd/uninstall"
 	"sqlpkg.org/cli/cmd/update"
+	"sqlpkg.org/cli/cmd/which"
 	"sqlpkg.org/cli/logx"
 )
 
@@ -57,6 +58,8 @@ func execCommand(command string, args []string) error {
 		return list.List(args)
 	case "info":
 		return info.Info(args)
+	case "which":
+		return which.Which(args)
 	case "help":
 		return help.Help(args)
 	case "version":

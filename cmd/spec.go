@@ -28,7 +28,7 @@ func FindSpec(path string) (*spec.Package, error) {
 		return pkg, nil
 	}
 
-	logx.Debug("installed package not found")
+	logx.Debug("package is not installed")
 	pkg, err := ReadSpec(path)
 	return pkg, err
 }

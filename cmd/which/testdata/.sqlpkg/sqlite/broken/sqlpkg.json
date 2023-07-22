@@ -1,0 +1,13 @@
+{
+    "owner": "sqlite",
+    "name": "broken",
+    "assets": {
+        "path": "broken",
+        "files": {
+            "darwin-amd64": "broken.dylib",
+            "darwin-arm64": "broken.dylib",
+            "linux-amd64": "broken.so",
+            "windows-amd64": "broken.dll"
+        }
+    }
+}

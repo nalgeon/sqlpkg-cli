@@ -25,6 +25,7 @@ func TestHelp(t *testing.T) {
 	mem.MustHave(t, "list")
 	mem.MustHave(t, "init")
 	mem.MustHave(t, "info")
+	mem.MustHave(t, "which")
 	mem.MustHave(t, "help")
 	mem.MustHave(t, "version")
 
