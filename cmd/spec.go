@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"sqlpkg.org/cli/checksums"
+	"sqlpkg.org/cli/logx"
 	"sqlpkg.org/cli/spec"
 )
 
@@ -15,8 +16,8 @@ func ReadSpec(path string) (*spec.Package, error) {
 		return nil, fmt.Errorf("failed to read package spec: %w", err)
 	}
 	pkg.ExpandVars()
-	Debug("found package spec at %s", pkg.Specfile)
-	Debug("read package %s, version = %s", pkg.FullName(), pkg.Version)
+	logx.Debug("found package spec at %s", pkg.Specfile)
+	logx.Debug("read package %s, version = %s", pkg.FullName(), pkg.Version)
 	return pkg, nil
 }
 
@@ -27,7 +28,7 @@ func FindSpec(path string) (*spec.Package, error) {
 		return pkg, nil
 	}
 
-	Debug("installed package not found")
+	logx.Debug("installed package not found")
 	pkg, err := ReadSpec(path)
 	return pkg, err
 }
@@ -44,7 +45,7 @@ func ReadInstalledSpec(fullName string) *spec.Package {
 		return nil
 	}
 
-	Debug("found installed package")
+	logx.Debug("found installed package")
 	return pkg
 }
 
@@ -52,14 +53,14 @@ func ReadInstalledSpec(fullName string) *spec.Package {
 func ReadChecksums(pkg *spec.Package) error {
 	path := pkg.Assets.Path.Join(checksums.FileName)
 	if !checksums.Exists(path.Value, path.IsRemote) {
-		Debug("missing spec checksum file")
+		logx.Debug("missing spec checksum file")
 		return nil
 	}
 	sums, err := checksums.Read(path.Value, path.IsRemote)
 	if err != nil {
 		return fmt.Errorf("failed to read checksum file: %w", err)
 	}
-	Debug("read %d checksums", len(sums))
+	logx.Debug("read %d checksums", len(sums))
 	pkg.Assets.Checksums = sums
 	return nil
 }

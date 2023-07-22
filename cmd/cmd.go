@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"sqlpkg.org/cli/fileio"
+	"sqlpkg.org/cli/logx"
 	"sqlpkg.org/cli/spec"
 )
 
@@ -55,6 +56,6 @@ func GetDirByFullName(fullName string) (string, error) {
 // PrintLocalRepo prints information about the local sqlpkg repository.
 func PrintLocalRepo() {
 	if WorkDir == "." {
-		Log("(local repository)")
+		logx.Log("(local repository)")
 	}
 }

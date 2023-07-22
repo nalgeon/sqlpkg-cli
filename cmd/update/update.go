@@ -7,6 +7,7 @@ import (
 
 	"sqlpkg.org/cli/cmd"
 	"sqlpkg.org/cli/lockfile"
+	"sqlpkg.org/cli/logx"
 	"sqlpkg.org/cli/spec"
 )
 
@@ -37,31 +38,31 @@ func UpdateAll(args []string) error {
 	for _, path := range paths {
 		pkg, err := spec.ReadLocal(path)
 		if err != nil {
-			cmd.Log("! invalid package %s: %s", path, err)
+			logx.Log("! invalid package %s: %s", path, err)
 			continue
 		}
-		cmd.Debug("found local spec from %s", path)
-		cmd.Debug("read package %s, version = %s", pkg.FullName(), pkg.Version)
+		logx.Debug("found local spec from %s", path)
+		logx.Debug("read package %s, version = %s", pkg.FullName(), pkg.Version)
 
-		cmd.Log("> updating %s...", pkg.FullName())
+		logx.Log("> updating %s...", pkg.FullName())
 		updPkg, err := updatePackage(lck, getSpecPath(pkg))
 		if err != nil {
-			cmd.Log("! error updating %s: %s", pkg.FullName(), err)
+			logx.Log("! error updating %s: %s", pkg.FullName(), err)
 			continue
 		}
 		if updPkg == nil {
-			cmd.Log("✓ already at the latest version")
+			logx.Log("✓ already at the latest version")
 			continue
 		}
 		updVersion := updPkg.Version
 		if updVersion == "" {
 			updVersion = "latest version"
 		}
-		cmd.Log("✓ updated package %s to %s", updPkg.FullName(), updVersion)
+		logx.Log("✓ updated package %s to %s", updPkg.FullName(), updVersion)
 		count += 1
 	}
 
-	cmd.Log("updated %d packages", count)
+	logx.Log("updated %d packages", count)
 	return nil
 }
 
@@ -81,26 +82,26 @@ func Update(args []string) error {
 	if err != nil {
 		return fmt.Errorf("invalid package: %w", err)
 	}
-	cmd.Debug("found local spec from %s", path)
-	cmd.Debug("read package %s, version = %s", pkg.FullName(), pkg.Version)
+	logx.Debug("found local spec from %s", path)
+	logx.Debug("read package %s, version = %s", pkg.FullName(), pkg.Version)
 
 	lck, err := cmd.ReadLockfile()
 	if err != nil {
 		return err
 	}
 
-	cmd.Log("> updating %s...", pkg.FullName())
+	logx.Log("> updating %s...", pkg.FullName())
 	updPkg, err := updatePackage(lck, getSpecPath(pkg))
 	if err != nil {
 		return fmt.Errorf("failed to update: %w", err)
 	}
 
 	if updPkg == nil {
-		cmd.Log("✓ already at the latest version")
+		logx.Log("✓ already at the latest version")
 		return nil
 	}
 
-	cmd.Log("✓ updated package %s to %s", updPkg.FullName(), updPkg.Version)
+	logx.Log("✓ updated package %s to %s", updPkg.FullName(), updPkg.Version)
 	return nil
 }
 
@@ -108,7 +109,7 @@ func Update(args []string) error {
 // Returns true if the package was actually updated, false otherwise
 // (already at the latest version or encountered an error).
 func updatePackage(lck *lockfile.Lockfile, path string) (*spec.Package, error) {
-	cmd.Debug("using spec path: %s", path)
+	logx.Debug("using spec path: %s", path)
 	pkg, err := cmd.ReadSpec(path)
 	if err != nil {
 		return nil, err

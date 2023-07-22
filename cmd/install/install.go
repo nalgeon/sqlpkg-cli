@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"sqlpkg.org/cli/cmd"
+	"sqlpkg.org/cli/logx"
 	"sqlpkg.org/cli/spec"
 )
 
@@ -18,10 +19,10 @@ func InstallAll(args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd.Debug("loaded the lockfile with %d packages", len(lck.Packages))
+	logx.Debug("loaded the lockfile with %d packages", len(lck.Packages))
 
 	if len(lck.Packages) == 0 {
-		cmd.Log("no packages found in the lockfile")
+		logx.Log("no packages found in the lockfile")
 		return nil
 	}
 
@@ -30,14 +31,14 @@ func InstallAll(args []string) error {
 		err = installLockedPackage(pkg)
 		if err != nil {
 			errCount += 1
-			cmd.Log("! %s", err)
+			logx.Log("! %s", err)
 		}
 	}
 
 	if errCount > 0 {
 		return fmt.Errorf("failed to install %d packages", errCount)
 	}
-	cmd.Log("installed %d packages", len(lck.Packages))
+	logx.Log("installed %d packages", len(lck.Packages))
 	return nil
 }
 
@@ -56,7 +57,7 @@ func Install(args []string) error {
 
 // installPackage installs a package using a specfile from a given path.
 func installPackage(path string) error {
-	cmd.Log("> installing %s...", path)
+	logx.Log("> installing %s...", path)
 
 	pkg, err := cmd.ReadSpec(path)
 	if err != nil {
@@ -69,7 +70,7 @@ func installPackage(path string) error {
 	}
 
 	if !cmd.HasNewVersion(pkg) {
-		cmd.Log("✓ already at the latest version")
+		logx.Log("✓ already at the latest version")
 		return nil
 	}
 
@@ -119,7 +120,7 @@ func installPackage(path string) error {
 	}
 
 	dir := spec.Dir(cmd.WorkDir, pkg.Owner, pkg.Name)
-	cmd.Log("✓ installed package %s to %s", pkg.FullName(), dir)
+	logx.Log("✓ installed package %s to %s", pkg.FullName(), dir)
 	return nil
 }
 
@@ -127,11 +128,11 @@ func installPackage(path string) error {
 func installLockedPackage(lckPkg *spec.Package) error {
 	path := lckPkg.Specfile
 	if path == "" {
-		cmd.Debug("missing specfile for %s, falling back to name/owner", lckPkg.FullName())
+		logx.Debug("missing specfile for %s, falling back to name/owner", lckPkg.FullName())
 		path = lckPkg.FullName()
 	}
 
-	cmd.Log("> installing %s...", path)
+	logx.Log("> installing %s...", path)
 
 	pkg, err := cmd.ReadSpec(path)
 	if err != nil {
@@ -139,12 +140,12 @@ func installLockedPackage(lckPkg *spec.Package) error {
 	}
 
 	// lock the version
-	cmd.Debug("locked version = %s", lckPkg.Version)
+	logx.Debug("locked version = %s", lckPkg.Version)
 	pkg.Version = lckPkg.Version
 	pkg.Assets = lckPkg.Assets
 
 	if !cmd.HasNewVersion(pkg) {
-		cmd.Log("✓ already at the %s version", pkg.Version)
+		logx.Log("✓ already at the %s version", pkg.Version)
 		return nil
 	}
 
@@ -182,6 +183,6 @@ func installLockedPackage(lckPkg *spec.Package) error {
 	// it's already there
 
 	dir := spec.Dir(cmd.WorkDir, pkg.Owner, pkg.Name)
-	cmd.Log("✓ installed package %s to %s", pkg.FullName(), dir)
+	logx.Log("✓ installed package %s to %s", pkg.FullName(), dir)
 	return nil
 }

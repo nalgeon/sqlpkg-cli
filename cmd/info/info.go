@@ -6,6 +6,7 @@ import (
 
 	"sqlpkg.org/cli/cmd"
 	"sqlpkg.org/cli/fileio"
+	"sqlpkg.org/cli/logx"
 	"sqlpkg.org/cli/spec"
 )
 
@@ -20,13 +21,13 @@ func Info(args []string) error {
 	path := args[0]
 	pkg, err := cmd.FindSpec(path)
 	if err != nil {
-		cmd.Debug(err.Error())
-		cmd.Log("package not found")
+		logx.Debug(err.Error())
+		logx.Log("package not found")
 		return nil
 	}
 
 	lines := prepareInfo(pkg)
-	cmd.Log(strings.Join(lines, "\n"))
+	logx.Log(strings.Join(lines, "\n"))
 
 	return nil
 }

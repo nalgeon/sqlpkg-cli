@@ -7,6 +7,7 @@ import (
 
 	"sqlpkg.org/cli/cmd"
 	"sqlpkg.org/cli/fileio"
+	"sqlpkg.org/cli/logx"
 )
 
 const uninstallHelp = "usage: sqlpkg uninstall package"
@@ -20,7 +21,7 @@ func Uninstall(args []string) error {
 	cmd.PrintLocalRepo()
 
 	fullName := args[0]
-	cmd.Log("> uninstalling %s...", fullName)
+	logx.Log("> uninstalling %s...", fullName)
 
 	err := removePackageDir(fullName)
 	if err != nil {
@@ -37,7 +38,7 @@ func Uninstall(args []string) error {
 		return err
 	}
 
-	cmd.Log("✓ uninstalled package %s", fullName)
+	logx.Log("✓ uninstalled package %s", fullName)
 	return nil
 }
 
@@ -47,18 +48,18 @@ func removePackageDir(fullName string) error {
 		return err
 	}
 
-	cmd.Debug("checking dir: %s", dir)
+	logx.Debug("checking dir: %s", dir)
 	if !fileio.Exists(dir) {
-		cmd.Debug("package dir not found")
+		logx.Debug("package dir not found")
 		return errors.New("package is not installed")
 	}
 
-	cmd.Debug("deleting dir: %s", dir)
+	logx.Debug("deleting dir: %s", dir)
 	err = os.RemoveAll(dir)
 	if err != nil {
 		return fmt.Errorf("failed to delete package dir: %w", err)
 	}
 
-	cmd.Debug("deleted package dir")
+	logx.Debug("deleted package dir")
 	return nil
 }

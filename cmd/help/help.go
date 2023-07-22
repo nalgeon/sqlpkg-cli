@@ -6,7 +6,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"sqlpkg.org/cli/cmd"
+	"sqlpkg.org/cli/logx"
 )
 
 const helpHelp = "usage: sqlpkg help"
@@ -32,8 +32,8 @@ func Help(args []string) error {
 		return errors.New(helpHelp)
 	}
 
-	cmd.Log("`sqlpkg` is an SQLite package manager. Use it to install or update SQLite extensions.\n")
-	cmd.Log("Commands:")
+	logx.Log("`sqlpkg` is an SQLite package manager. Use it to install or update SQLite extensions.\n")
+	logx.Log("Commands:")
 	w := tabwriter.NewWriter(os.Stdout, 0, 4, 0, ' ', 0)
 	for _, cmd := range commands {
 		fmt.Fprintln(w, cmd, "\t", commandsHelp[cmd])

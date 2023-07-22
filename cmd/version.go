@@ -8,6 +8,7 @@ import (
 	"sqlpkg.org/cli/fileio"
 	"sqlpkg.org/cli/github"
 	"sqlpkg.org/cli/httpx"
+	"sqlpkg.org/cli/logx"
 	"sqlpkg.org/cli/spec"
 )
 
@@ -19,7 +20,7 @@ func ResolveVersion(pkg *spec.Package) error {
 
 	hostname := httpx.Hostname(pkg.Repository)
 	if hostname != github.Hostname {
-		Debug("unknown provider %s, not resolving version", hostname)
+		logx.Debug("unknown provider %s, not resolving version", hostname)
 		return nil
 	}
 
@@ -34,7 +35,7 @@ func ResolveVersion(pkg *spec.Package) error {
 	}
 
 	pkg.ForceVersion(version)
-	Debug("resolved latest version = %s", version)
+	logx.Debug("resolved latest version = %s", version)
 	return nil
 }
 
@@ -49,7 +50,7 @@ func HasNewVersion(pkg *spec.Package) bool {
 	if err != nil {
 		return true
 	}
-	Debug("local package version = %s", oldPkg.Version)
+	logx.Debug("local package version = %s", oldPkg.Version)
 
 	if oldPkg.Version == "" {
 		// not explicitly versioned, always assume there is a later version

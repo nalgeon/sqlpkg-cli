@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	"sqlpkg.org/cli/cmd"
 	"sqlpkg.org/cli/cmd/help"
 	"sqlpkg.org/cli/cmd/info"
 	init_ "sqlpkg.org/cli/cmd/init"
@@ -14,6 +13,7 @@ import (
 	"sqlpkg.org/cli/cmd/list"
 	"sqlpkg.org/cli/cmd/uninstall"
 	"sqlpkg.org/cli/cmd/update"
+	"sqlpkg.org/cli/logx"
 )
 
 var version = "main"
@@ -23,9 +23,11 @@ func parseArgs() (command string, args []string) {
 		return "", nil
 	}
 
-	flag.BoolVar(&cmd.IsVerbose, "v", false, "verbose output")
+	var isVerbose bool
+	flag.BoolVar(&isVerbose, "v", false, "verbose output")
 	flag.Parse()
 
+	logx.SetVerbose(isVerbose)
 	args = flag.Args()
 	command, args = args[0], args[1:]
 	return

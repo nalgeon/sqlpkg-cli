@@ -10,13 +10,14 @@ import (
 
 	"sqlpkg.org/cli/assets"
 	"sqlpkg.org/cli/fileio"
+	"sqlpkg.org/cli/logx"
 	"sqlpkg.org/cli/spec"
 )
 
 // BuildAssetPath constructs an URL to download package asset.
 func BuildAssetPath(pkg *spec.Package) (*spec.AssetPath, error) {
-	Debug("checking remote asset for platform %s-%s", runtime.GOOS, runtime.GOARCH)
-	Debug("asset base path = %s", pkg.Assets.Path)
+	logx.Debug("checking remote asset for platform %s-%s", runtime.GOOS, runtime.GOARCH)
+	logx.Debug("asset base path = %s", pkg.Assets.Path)
 
 	assetPath, err := pkg.AssetPath(runtime.GOOS, runtime.GOARCH)
 	if err != nil {
@@ -32,7 +33,7 @@ func BuildAssetPath(pkg *spec.Package) (*spec.AssetPath, error) {
 
 // DownloadAsset downloads package asset.
 func DownloadAsset(pkg *spec.Package, assetPath *spec.AssetPath) (*assets.Asset, error) {
-	Debug("downloading %s", assetPath)
+	logx.Debug("downloading %s", assetPath)
 	dir := spec.Dir(os.TempDir(), pkg.Owner, pkg.Name)
 	err := fileio.CreateDir(dir)
 	if err != nil {
@@ -50,7 +51,7 @@ func DownloadAsset(pkg *spec.Package, assetPath *spec.AssetPath) (*assets.Asset,
 	}
 
 	sizeKb := float64(asset.Size) / 1024
-	Debug("downloaded %s (%.2f Kb)", asset.Name, sizeKb)
+	logx.Debug("downloaded %s (%.2f Kb)", asset.Name, sizeKb)
 	return asset, nil
 }
 
@@ -58,7 +59,7 @@ func DownloadAsset(pkg *spec.Package, assetPath *spec.AssetPath) (*assets.Asset,
 func ValidateAsset(pkg *spec.Package, asset *assets.Asset) error {
 	checksumStr, ok := pkg.Assets.Checksums[asset.Name]
 	if !ok {
-		Debug("spec is missing asset checksum")
+		logx.Debug("spec is missing asset checksum")
 		return nil
 	}
 
@@ -71,7 +72,7 @@ func ValidateAsset(pkg *spec.Package, asset *assets.Asset) error {
 		return fmt.Errorf("asset checksum is invalid")
 	}
 
-	Debug("asset checksum is valid")
+	logx.Debug("asset checksum is valid")
 	return nil
 }
 
@@ -82,14 +83,14 @@ func UnpackAsset(pkg *spec.Package, asset *assets.Asset) error {
 		return fmt.Errorf("failed to unpack asset: %w", err)
 	}
 	if nFiles == 0 {
-		Debug("not an archive, skipping unpack: %s", asset.Name)
+		logx.Debug("not an archive, skipping unpack: %s", asset.Name)
 		return nil
 	}
 	err = os.Remove(asset.Path)
 	if err != nil {
 		return fmt.Errorf("failed to delete asset after unpacking: %w", err)
 	}
-	Debug("unpacked %d files from %s", nFiles, asset.Name)
+	logx.Debug("unpacked %d files from %s", nFiles, asset.Name)
 	return nil
 }
 
@@ -131,6 +132,6 @@ func DequarantineFiles(pkg *spec.Package) error {
 		return fmt.Errorf("failed to dequarantine files: %w", allErr)
 	}
 
-	Debug("removed %d files from quarantine", len(paths))
+	logx.Debug("removed %d files from quarantine", len(paths))
 	return nil
 }

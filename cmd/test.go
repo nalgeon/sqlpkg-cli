@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"sqlpkg.org/cli/logx"
 )
 
 func SetupTestRepo(t *testing.T) (string, string) {
@@ -49,4 +51,11 @@ func TeardownTestRepo(t *testing.T, repoDir, lockPath string) {
 	if err != nil {
 		t.Fatalf("TeardownTestRepo: %v", err)
 	}
+}
+
+func SetupTestLogger() *logx.Memory {
+	memory := logx.NewMemory("log")
+	logx.SetOutput(memory)
+	logx.SetVerbose(true)
+	return memory
 }

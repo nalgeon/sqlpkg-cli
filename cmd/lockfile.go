@@ -6,6 +6,7 @@ import (
 
 	"sqlpkg.org/cli/fileio"
 	"sqlpkg.org/cli/lockfile"
+	"sqlpkg.org/cli/logx"
 	"sqlpkg.org/cli/spec"
 )
 
@@ -13,7 +14,7 @@ import (
 func ReadLockfile() (*lockfile.Lockfile, error) {
 	path := lockfile.Path(WorkDir)
 	if !fileio.Exists(path) {
-		Debug("created new lockfile")
+		logx.Debug("created new lockfile")
 		return lockfile.NewLockfile(), nil
 	}
 
@@ -22,7 +23,7 @@ func ReadLockfile() (*lockfile.Lockfile, error) {
 		return nil, fmt.Errorf("failed to read lockfile: %w", err)
 	}
 
-	Debug("read existing lockfile")
+	logx.Debug("read existing lockfile")
 	return lck, nil
 }
 
@@ -34,7 +35,7 @@ func AddToLockfile(lck *lockfile.Lockfile, pkg *spec.Package) error {
 		return fmt.Errorf("failed to save lockfile: %w", err)
 	}
 
-	Debug("added package to the lockfile")
+	logx.Debug("added package to the lockfile")
 	return nil
 }
 
@@ -42,7 +43,7 @@ func AddToLockfile(lck *lockfile.Lockfile, pkg *spec.Package) error {
 func RemoveFromLockfile(lck *lockfile.Lockfile, fullName string) error {
 	pkg, ok := lck.Packages[fullName]
 	if !ok {
-		Debug("package not listed in the lockfile")
+		logx.Debug("package not listed in the lockfile")
 		return nil
 	}
 
@@ -52,6 +53,6 @@ func RemoveFromLockfile(lck *lockfile.Lockfile, fullName string) error {
 		return fmt.Errorf("failed to save lockfile: %w", err)
 	}
 
-	Debug("removed package from the lockfile")
+	logx.Debug("removed package from the lockfile")
 	return nil
 }

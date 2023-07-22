@@ -10,6 +10,7 @@ import (
 
 	"sqlpkg.org/cli/cmd"
 	"sqlpkg.org/cli/lockfile"
+	"sqlpkg.org/cli/logx"
 	"sqlpkg.org/cli/spec"
 )
 
@@ -55,7 +56,7 @@ func gatherPackages() ([]*spec.Package, error) {
 		packages = append(packages, pkg)
 	}
 
-	cmd.Debug("gathered %d packages", len(packages))
+	logx.Debug("gathered %d packages", len(packages))
 	return packages, nil
 }
 
@@ -79,7 +80,7 @@ func addMissingToLockfile(lck *lockfile.Lockfile, packages []*spec.Package) erro
 		return fmt.Errorf("failed to save lockfile: %w", err)
 	}
 
-	cmd.Debug("added %d packages to the lockfile", count)
+	logx.Debug("added %d packages to the lockfile", count)
 	return nil
 }
 
@@ -94,7 +95,7 @@ func sortPackages(packages []*spec.Package) {
 func printPackages(packages []*spec.Package) {
 	cmd.PrintLocalRepo()
 	if len(packages) == 0 {
-		cmd.Log("no packages installed")
+		logx.Log("no packages installed")
 		return
 	}
 
