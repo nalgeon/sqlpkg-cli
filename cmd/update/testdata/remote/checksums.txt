@@ -1,0 +1,4 @@
+00cfa320176893e360b711c6e39ecfcfbfe740701f219e703ad443931e3817ac  example-linux-0.2.0-x86.zip
+bab78b469a7db67739a7a2bb48a5ede5c8ccc5a59643e916fd68e33f9daead3b  example-macos-0.2.0-arm64.zip
+bab78b469a7db67739a7a2bb48a5ede5c8ccc5a59643e916fd68e33f9daead3b  example-macos-0.2.0-x86.zip
+289ae296615dd2dc27729d957f36f0ab0e88e5b05ed13ca2c698ec84f2219e05  example-win-0.2.0-x64.zip

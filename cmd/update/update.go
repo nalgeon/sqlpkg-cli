@@ -40,9 +40,11 @@ func UpdateAll(args []string) error {
 			cmd.Log("! invalid package %s: %s", path, err)
 			continue
 		}
+		cmd.Debug("found local spec from %s", path)
+		cmd.Debug("read package %s, version = %s", pkg.FullName(), pkg.Version)
 
 		cmd.Log("> updating %s...", pkg.FullName())
-		updPkg, err := updatePackage(lck, pkg.FullName())
+		updPkg, err := updatePackage(lck, getSpecPath(pkg))
 		if err != nil {
 			cmd.Log("! error updating %s: %s", pkg.FullName(), err)
 			continue
@@ -79,6 +81,8 @@ func Update(args []string) error {
 	if err != nil {
 		return fmt.Errorf("invalid package: %w", err)
 	}
+	cmd.Debug("found local spec from %s", path)
+	cmd.Debug("read package %s, version = %s", pkg.FullName(), pkg.Version)
 
 	lck, err := cmd.ReadLockfile()
 	if err != nil {
@@ -86,7 +90,7 @@ func Update(args []string) error {
 	}
 
 	cmd.Log("> updating %s...", pkg.FullName())
-	updPkg, err := updatePackage(lck, pkg.FullName())
+	updPkg, err := updatePackage(lck, getSpecPath(pkg))
 	if err != nil {
 		return fmt.Errorf("failed to update: %w", err)
 	}
@@ -103,8 +107,9 @@ func Update(args []string) error {
 // updatePackage updates a package.
 // Returns true if the package was actually updated, false otherwise
 // (already at the latest version or encountered an error).
-func updatePackage(lck *lockfile.Lockfile, fullName string) (*spec.Package, error) {
-	pkg, err := cmd.ReadSpec(fullName)
+func updatePackage(lck *lockfile.Lockfile, path string) (*spec.Package, error) {
+	cmd.Debug("using spec path: %s", path)
+	pkg, err := cmd.ReadSpec(path)
 	if err != nil {
 		return nil, err
 	}
@@ -159,4 +164,13 @@ func updatePackage(lck *lockfile.Lockfile, fullName string) (*spec.Package, erro
 	}
 
 	return pkg, nil
+}
+
+// getSpecPath returns a remote package spec path.
+func getSpecPath(pkg *spec.Package) string {
+	if pkg.Specfile != "" {
+		return pkg.Specfile
+	}
+	// in older specs the .Specfile may be empty
+	return pkg.FullName()
 }

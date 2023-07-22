@@ -1,0 +1,20 @@
+{
+    "owner": "nalgeon",
+    "name": "example",
+    "version": "0.2.0",
+    "homepage": "https://github.com/nalgeon/sqlite-example/blob/main/README.md",
+    "repository": "https://github.com/nalgeon/sqlite-example",
+    "authors": ["Anton Zhiyanov"],
+    "license": "MIT",
+    "description": "Example extension.",
+    "keywords": ["sqlite-example"],
+    "assets": {
+        "path": "./testdata/remote",
+        "files": {
+            "darwin-amd64": "example-macos-{version}-x86.zip",
+            "darwin-arm64": "example-macos-{version}-arm64.zip",
+            "linux-amd64": "example-linux-{version}-x86.zip",
+            "windows-amd64": "example-win-{version}-x64.zip"
+        }
+    }
+}
