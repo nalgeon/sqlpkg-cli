@@ -25,6 +25,15 @@ $ sqlpkg help
 
 Please note that `sqlpkg` is new and a bit rough around the edges.
 
+[Download](#downloading-and-installing) •
+[Install packages](#installing-packages) •
+[Package location](#package-location) •
+[Load into SQLite](#loading-installed-extensions-in-sqlite) •
+[Other commands](#other-commands) •
+[Local repository](#using-a-local-repository) •
+[Spec file](#package-spec-file) •
+[Lockfile](#lockfile)
+
 ## Downloading and installing
 
 `sqlpkg` is a binary executable file (`sqlpkg.exe` on Windows, `sqlpkg` on Linux/macOS). Download it from the link below, unpack and put somewhere in your `PATH` ([what's that?](https://gist.github.com/nex3/c395b2f8fd4b02068be37c961301caa7)), so you can run it from anyhwere on your computer.
