@@ -26,4 +26,10 @@ The `assets.path` is a base URL for the package assets. The assets themselves ar
 
 At least one file in `asset.files` is required. The `path` can be omitted if there is a `repository` (more on this later).
 
-To be continued. In the meantime, if you have any questions — open an [issue](https://github.com/nalgeon/sqlpkg-cli/issues/new) or ask on [Discord](https://discord.com/invite/6VeJBMDs3q).
+To be continued. In the meantime, check out the existing package specs for reference:
+
+-   [asg017/hello](https://github.com/nalgeon/sqlpkg/blob/main/pkg/asg017/hello.json)
+-   [nalgeon/uuid](https://github.com/nalgeon/sqlpkg/blob/main/pkg/nalgeon/uuid.json)
+-   [sqlite/stmt](https://github.com/nalgeon/sqlpkg/blob/main/pkg/sqlite/stmt.json)
+
+If you have any questions — open an [issue](https://github.com/nalgeon/sqlpkg-cli/issues/new) or ask on [Discord](https://discord.com/invite/6VeJBMDs3q).
