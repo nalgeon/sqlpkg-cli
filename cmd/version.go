@@ -34,7 +34,7 @@ func ResolveVersion(pkg *spec.Package) error {
 		return fmt.Errorf("failed to get latest tag: %w", err)
 	}
 
-	pkg.ForceVersion(version)
+	pkg.ReplaceLatest(version)
 	logx.Debug("resolved latest version = %s", version)
 	return nil
 }

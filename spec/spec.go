@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"sqlpkg.org/cli/fileio"
 	"sqlpkg.org/cli/httpx"
 )
 
@@ -22,44 +21,6 @@ const FileName = "sqlpkg.json"
 // downloadBase determines default asset url for known providers.
 var downloadBase = map[string]string{
 	"github.com": "{repository}/releases/download/{version}",
-}
-
-// An Asset describes a local file path or a remote URL.
-type AssetPath struct {
-	Value    string
-	IsRemote bool
-}
-
-// Exists checks if the asset actually exists at the said path.
-func (p *AssetPath) Exists() bool {
-	if p.IsRemote {
-		return httpx.Exists(p.Value)
-	} else {
-		return fileio.Exists(p.Value)
-	}
-}
-
-// Join appends a filename to the path.
-func (p *AssetPath) Join(fileName string) *AssetPath {
-	if p.IsRemote {
-		return &AssetPath{p.Value + "/" + fileName, true}
-	} else {
-		return &AssetPath{filepath.Join(p.Value, fileName), false}
-	}
-}
-
-func (p *AssetPath) MarshalText() ([]byte, error) {
-	return []byte(p.Value), nil
-}
-
-func (p *AssetPath) UnmarshalText(text []byte) error {
-	p.Value = string(text)
-	p.IsRemote = httpx.IsURL(p.Value) || strings.HasPrefix(p.Value, "{repository}")
-	return nil
-}
-
-func (p *AssetPath) String() string {
-	return p.Value
 }
 
 // A Package describes the package spec.
@@ -96,26 +57,34 @@ func (p *Package) ExpandVars() {
 	if p.Assets.Path == nil || p.Assets.Path.Value == "" {
 		p.Assets.Path = &AssetPath{inferAssetUrl(p.Repository), true}
 	}
+	version := p.Version
+	if version == "latest" {
+		// "latest" is a placeholder, so keep it as a variable
+		// to replace later when the package is actually installed
+		version = "{latest}"
+	}
 	p.Assets.Path.Value = stringFormat(p.Assets.Path.Value, map[string]any{
 		"repository": p.Repository,
 		"owner":      p.Owner,
 		"name":       p.Name,
-		"version":    p.Version,
+		"version":    version,
 	})
 	for platform, file := range p.Assets.Files {
 		p.Assets.Files[platform] = stringFormat(file, map[string]any{
-			"version": p.Version,
+			"version": version,
 		})
 	}
 }
 
-// ForceVersion forces a specific package version.
-func (p *Package) ForceVersion(version string) {
+// ReplaceLatest forces a specific package version instead of the "latest" placeholder.
+func (p *Package) ReplaceLatest(version string) {
+	if p.Version != "latest" {
+		return
+	}
 	p.Version = version
-	// FIXME: may erroneously replace "latest" where it is not a version
-	p.Assets.Path.Value = strings.Replace(p.Assets.Path.Value, "latest", version, 1)
+	p.Assets.Path.Value = strings.Replace(p.Assets.Path.Value, "{latest}", version, 1)
 	for platform, file := range p.Assets.Files {
-		p.Assets.Files[platform] = strings.Replace(file, "latest", version, 1)
+		p.Assets.Files[platform] = strings.Replace(file, "{latest}", version, 1)
 	}
 }
 
