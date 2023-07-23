@@ -30,8 +30,6 @@ Please note that `sqlpkg` is new and a bit rough around the edges.
 [Package location](#package-location) •
 [Load into SQLite](#loading-installed-extensions-in-sqlite) •
 [Other commands](#other-commands) •
-[Local repository](#using-a-local-repository) •
-[Spec file](#package-spec-file) •
 [Lockfile](#lockfile)
 
 ## Downloading and installing
