@@ -4,6 +4,25 @@
 
 It works primarily with the [SQLite package registry](https://sqlpkg.org/), but is not limited to it. You can install SQLite extensions from GitHub repositories or other websites. All you need is a package spec file (more on that later).
 
+```
+$ sqlpkg help
+╭────────────────────────────────────────────────╮
+│ sqlpkg is an SQLite package manager.           │
+│ Use it to install or update SQLite extensions. │
+│                                                │
+│ Commands:                                      │
+│ help       Display help                        │
+│ info       Display package information         │
+│ init       Create local repository             │
+│ install    Install packages                    │
+│ list       List installed packages             │
+│ uninstall  Uninstall package                   │
+│ update     Update installed packages           │
+│ version    Display version                     │
+│ which      Display path to extension file      │
+╰────────────────────────────────────────────────╯
+```
+
 Please note that `sqlpkg` is new and a bit rough around the edges.
 
 ## Downloading and installing
@@ -164,7 +183,7 @@ It will create an `.sqlpkg` folder in the current directory. After that, all oth
 
 The package spec file describes a particular package so that `sqlpkg` can work with it. It is usually created by the package author, so if you are a `sqlpkg` user, you don't need to worry about that.
 
-If you _are_ a package author, who wants your package to be installable by `sqlpkg`, learn how to create a spec file using [this guide](docs/spec-file.md).
+If you _are_ a package author, who wants your package to be installable by `sqlpkg`, learn how to create a [spec file](docs/spec-file.md).
 
 ## Lockfile
 
