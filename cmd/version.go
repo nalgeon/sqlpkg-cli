@@ -4,12 +4,12 @@ package cmd
 import (
 	"fmt"
 
-	"golang.org/x/mod/semver"
 	"sqlpkg.org/cli/fileio"
 	"sqlpkg.org/cli/github"
 	"sqlpkg.org/cli/httpx"
 	"sqlpkg.org/cli/logx"
 	"sqlpkg.org/cli/spec"
+	"sqlpkg.org/cli/versions"
 )
 
 // ResolveVersion resolves the latest version if needed.
@@ -61,21 +61,5 @@ func HasNewVersion(pkg *spec.Package) bool {
 		return false
 	}
 
-	return compareVersions(oldPkg.Version, pkg.Version) < 0
-}
-
-// compareVersions compares package versions.
-// Returns 0 if v == w, -1 if v < w, or +1 if v > w.
-func compareVersions(v, w string) int {
-	if v == "" || w == "" {
-		return 0
-	}
-	// add the leading 'v' if needed
-	if v[0] != 'v' {
-		v = "v" + v
-	}
-	if w[0] != 'v' {
-		w = "v" + w
-	}
-	return semver.Compare(v, w)
+	return versions.Compare(oldPkg.Version, pkg.Version) < 0
 }

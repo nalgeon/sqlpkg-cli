@@ -23,7 +23,7 @@ $ sqlpkg help
 ╰────────────────────────────────────────────────╯
 ```
 
-Please note that `sqlpkg` is new and a bit rough around the edges.
+`sqlpkg` is implemented in Go and has zero dependencies.
 
 [Download](#downloading-and-installing) •
 [Install packages](#installing-packages) •
