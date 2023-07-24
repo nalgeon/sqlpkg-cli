@@ -1,4 +1,4 @@
-// Package versions implements comparison of semantic version strings.
+// Package semver implements comparison of semantic version strings.
 // The general form of a semantic version string is
 //
 //	MAJOR[.MINOR[.PATCH[-PRERELEASE][+BUILD]]]
@@ -7,7 +7,7 @@
 //   - allows the leading 'v' (e.g. v1.2.3)
 //   - treats MAJOR as MAJOR.0.0
 //   - treats MAJOR.MINOR as MAJOR.MINOR.0
-package versions
+package semver
 
 import (
 	"regexp"

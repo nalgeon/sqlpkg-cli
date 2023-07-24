@@ -8,8 +8,8 @@ import (
 	"sqlpkg.org/cli/github"
 	"sqlpkg.org/cli/httpx"
 	"sqlpkg.org/cli/logx"
+	"sqlpkg.org/cli/semver"
 	"sqlpkg.org/cli/spec"
-	"sqlpkg.org/cli/versions"
 )
 
 // ResolveVersion resolves the latest version if needed.
@@ -61,5 +61,5 @@ func HasNewVersion(pkg *spec.Package) bool {
 		return false
 	}
 
-	return versions.Compare(oldPkg.Version, pkg.Version) < 0
+	return semver.Compare(oldPkg.Version, pkg.Version) < 0
 }
