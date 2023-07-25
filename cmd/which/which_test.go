@@ -33,7 +33,7 @@ func TestExact(t *testing.T) {
 		}
 
 		mem.Print()
-		mem.MustHave(t, ".sqlpkg/nalgeon/version/version0.dylib")
+		mem.MustHave(t, ".sqlpkg/nalgeon/version/version0")
 		mem.MustNotHave(t, "exact match not found")
 	})
 	t.Run("prefix", func(t *testing.T) {
@@ -45,7 +45,7 @@ func TestExact(t *testing.T) {
 		}
 
 		mem.Print()
-		mem.MustHave(t, ".sqlpkg/nalgeon/prefix/libprefix.dylib")
+		mem.MustHave(t, ".sqlpkg/nalgeon/prefix/libprefix")
 		mem.MustNotHave(t, "exact match not found")
 	})
 
