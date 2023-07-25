@@ -102,7 +102,7 @@ func Unpack(path, pattern string) (int, error) {
 	if strings.HasSuffix(path, ".zip") {
 		return unpackZip(path, pattern, dir)
 	}
-	if strings.HasSuffix(path, ".tar.gz") {
+	if strings.HasSuffix(path, ".tar.gz") || strings.HasSuffix(path, ".tgz") {
 		return unpackTarGz(path, pattern, dir)
 	}
 	return 0, nil
