@@ -11,16 +11,43 @@ func TestExact(t *testing.T) {
 	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
 	cmd.CopyTestRepo(t, "")
-	mem := cmd.SetupTestLogger()
 
-	args := []string{"nalgeon/example"}
-	err := Which(args)
-	if err != nil {
-		t.Fatalf("which error: %v", err)
-	}
+	t.Run("exact", func(t *testing.T) {
+		mem := cmd.SetupTestLogger()
+		args := []string{"nalgeon/example"}
+		err := Which(args)
+		if err != nil {
+			t.Fatalf("which error: %v", err)
+		}
 
-	mem.Print()
-	mem.MustHave(t, ".sqlpkg/nalgeon/example/example")
+		mem.Print()
+		mem.MustHave(t, ".sqlpkg/nalgeon/example/example")
+		mem.MustNotHave(t, "exact match not found")
+	})
+	t.Run("version", func(t *testing.T) {
+		mem := cmd.SetupTestLogger()
+		args := []string{"nalgeon/version"}
+		err := Which(args)
+		if err != nil {
+			t.Fatalf("which error: %v", err)
+		}
+
+		mem.Print()
+		mem.MustHave(t, ".sqlpkg/nalgeon/version/version0.dylib")
+		mem.MustNotHave(t, "exact match not found")
+	})
+	t.Run("prefix", func(t *testing.T) {
+		mem := cmd.SetupTestLogger()
+		args := []string{"nalgeon/prefix"}
+		err := Which(args)
+		if err != nil {
+			t.Fatalf("which error: %v", err)
+		}
+
+		mem.Print()
+		mem.MustHave(t, ".sqlpkg/nalgeon/prefix/libprefix.dylib")
+		mem.MustNotHave(t, "exact match not found")
+	})
 
 	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }

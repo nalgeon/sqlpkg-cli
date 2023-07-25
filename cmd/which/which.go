@@ -77,6 +77,14 @@ func findExact(pkgDir, name, os string) string {
 			return paths[0]
 		}
 	}
+	{
+		// e.g., libtext.dylib
+		pattern := filepath.Join(pkgDir, "lib"+name+fileExt[os])
+		paths, _ := filepath.Glob(pattern)
+		if len(paths) != 0 {
+			return paths[0]
+		}
+	}
 	// no exact match
 	return ""
 }
