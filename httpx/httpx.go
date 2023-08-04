@@ -10,7 +10,12 @@ import (
 	"time"
 )
 
-var client = http.Client{Timeout: 3 * time.Second}
+var client = Client(&http.Client{Timeout: 3 * time.Second})
+
+// Client is something that can send HTTP requests.
+type Client interface {
+	Do(req *http.Request) (*http.Response, error)
+}
 
 // IsURL checks if the path is an url.
 func IsURL(path string) bool {
@@ -93,4 +98,9 @@ func GetBytes(url string) ([]byte, error) {
 	}
 	defer body.Close()
 	return io.ReadAll(body)
+}
+
+// SetClient sets a custom HTTP client instead of the default one.
+func SetClient(cli Client) {
+	client = cli
 }
