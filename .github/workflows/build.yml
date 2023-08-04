@@ -3,11 +3,9 @@ name: build
 on:
     push:
         branches: [main]
-        paths:
-            - .github/**
-            - cmd/**
-            - internal/**
-            - main.go
+        paths-ignore:
+            - docs/*
+            - README.md
     pull_request:
         branches: [main]
     workflow_dispatch:
