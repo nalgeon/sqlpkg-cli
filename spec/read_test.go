@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"sqlpkg.org/cli/httpx"
 )
 
 func TestRead(t *testing.T) {
@@ -46,6 +48,54 @@ func TestRead(t *testing.T) {
 		}
 		if !strings.Contains(err.Error(), "no such file or directory") {
 			t.Errorf("Read: unexpected error %v", err)
+		}
+	})
+}
+
+func TestReadRemote(t *testing.T) {
+	t.Run("valid", func(t *testing.T) {
+		url := "https://antonz.org/sqlpkg.json"
+		path := filepath.Join("testdata", "sqlpkg.json")
+
+		client := httpx.NewFileClient()
+		client.AddRoute(url, path)
+		httpx.SetClient(client)
+
+		got, err := ReadRemote(url)
+		if err != nil {
+			t.Fatalf("ReadRemote: unexpected error %v", err)
+		}
+
+		want := &Package{
+			Owner: "nalgeon", Name: "example", Version: "0.1.0",
+			Homepage:    "https://github.com/nalgeon/sqlite-example/blob/main/README.md",
+			Repository:  "https://github.com/nalgeon/sqlite-example",
+			Authors:     []string{"Anton Zhiyanov"},
+			License:     "MIT",
+			Description: "Example extension.",
+			Keywords:    []string{"sqlite-example"},
+			Assets: Assets{
+				Path: &AssetPath{Value: "{repository}/releases/download/{version}", IsRemote: true},
+				Files: map[string]string{
+					"darwin-amd64":  "example-macos-{version}-x86.zip",
+					"darwin-arm64":  "example-macos-{version}-arm64.zip",
+					"linux-amd64":   "example-linux-{version}-x86.zip",
+					"windows-amd64": "example-win-{version}-x64.zip",
+				},
+			},
+		}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("Read: unexpacted package %+v", got)
+		}
+	})
+	t.Run("missing", func(t *testing.T) {
+		url := "https://github.com/nalgeon/sqlite-missing/blob/main/sqlpkg.json"
+		_, err := ReadRemote(url)
+		if err == nil {
+			t.Fatal("ReadRemote: expected error, got nil")
+		}
+		if !strings.Contains(err.Error(), "http status 404") {
+			t.Errorf("ReadRemote: unexpected error %v", err)
 		}
 	})
 }
