@@ -96,7 +96,7 @@ func Copy(dir, path string) (asset *Asset, err error) {
 
 // Unpack unpacks an asset from the given path to the same dir
 // where the asset resides. If pattern is provided, unpacks
-// only the files that match it.
+// only the files that match it. Returns the number of unpacked files.
 func Unpack(path, pattern string) (int, error) {
 	dir, _ := filepath.Split(path)
 	if strings.HasSuffix(path, ".zip") {

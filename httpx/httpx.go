@@ -99,8 +99,3 @@ func GetBytes(url string) ([]byte, error) {
 	defer body.Close()
 	return io.ReadAll(body)
 }
-
-// SetClient sets a custom HTTP client instead of the default one.
-func SetClient(cli Client) {
-	client = cli
-}

@@ -53,14 +53,9 @@ func TestRead(t *testing.T) {
 }
 
 func TestReadRemote(t *testing.T) {
+	httpx.Mock()
 	t.Run("valid", func(t *testing.T) {
 		url := "https://antonz.org/sqlpkg.json"
-		path := filepath.Join("testdata", "sqlpkg.json")
-
-		client := httpx.NewFileClient()
-		client.AddRoute(url, path)
-		httpx.SetClient(client)
-
 		got, err := ReadRemote(url)
 		if err != nil {
 			t.Fatalf("ReadRemote: unexpected error %v", err)
@@ -89,7 +84,7 @@ func TestReadRemote(t *testing.T) {
 		}
 	})
 	t.Run("missing", func(t *testing.T) {
-		url := "https://github.com/nalgeon/sqlite-missing/blob/main/sqlpkg.json"
+		url := "https://github.com/nalgeon/sqlite-example/blob/main/missing.json"
 		_, err := ReadRemote(url)
 		if err == nil {
 			t.Fatal("ReadRemote: expected error, got nil")
