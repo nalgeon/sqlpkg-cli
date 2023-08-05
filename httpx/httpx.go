@@ -41,7 +41,11 @@ func Hostname(rawUrl string) string {
 
 // Exists checks if the specified url exists.
 func Exists(url string) bool {
-	resp, err := http.Head(url)
+	req, err := http.NewRequest(http.MethodHead, url, nil)
+	if err != nil {
+		return false
+	}
+	resp, err := client.Do(req)
 	if err != nil {
 		return false
 	}
