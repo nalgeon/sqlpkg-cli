@@ -9,7 +9,7 @@ import (
 var logger = NewLogger(os.Stdout)
 
 // IsVerbose returns true if the logger is verbose.
-func IsVerbose(out io.Writer) bool {
+func IsVerbose() bool {
 	return logger.IsVerbose
 }
 
