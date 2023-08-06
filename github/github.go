@@ -17,6 +17,16 @@ type release struct {
 	TagName string `json:"tag_name"`
 }
 
+// GetLatestTag fetches the latest release tag number for the repository.
+func GetLatestTag(owner, repo string) (string, error) {
+	url := fmt.Sprintf("%s/repos/%s/%s/releases/latest", apiUrl, owner, repo)
+	rel, err := httpx.GetJSON[release](url)
+	if err != nil {
+		return "", err
+	}
+	return rel.TagName, nil
+}
+
 // ParseRepoUrl extracts owner and repo names from the repo url.
 func ParseRepoUrl(repoUrl string) (owner string, repo string, err error) {
 	u, err := url.Parse(repoUrl)
@@ -32,14 +42,4 @@ func ParseRepoUrl(repoUrl string) (owner string, repo string, err error) {
 	owner = parts[0]
 	repo = parts[1]
 	return
-}
-
-// GetLatestTag fetches the latest release tag number for the repository.
-func GetLatestTag(owner, repo string) (string, error) {
-	url := fmt.Sprintf("%s/repos/%s/%s/releases/latest", apiUrl, owner, repo)
-	rel, err := httpx.GetJSON[release](url)
-	if err != nil {
-		return "", err
-	}
-	return rel.TagName, nil
 }
