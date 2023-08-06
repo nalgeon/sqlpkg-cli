@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"path"
 	"path/filepath"
@@ -24,8 +25,7 @@ type MockClient struct {
 	dir string
 }
 
-// NewFileClient creates a new MockClient and installs it
-// instead of the default one.
+// Mock creates a new MockClient and installs it instead of the default one.
 func Mock(path ...string) *MockClient {
 	dir := filepath.Join("testdata", filepath.Join(path...))
 	c := &MockClient{dir: dir}
@@ -67,4 +67,32 @@ func respond(cType string, data []byte) io.Reader {
 		panic(err)
 	}
 	return &buf
+}
+
+// MockServer creates a mock HTTP server and installs its client
+// instead of the default one. Serves responses from the file system
+// instead of remote calls. Should be used for testing purposes only.
+func MockServer() *httptest.Server {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		filename := filepath.Join("testdata", path.Base(r.URL.Path))
+
+		data, err := os.ReadFile(filename)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return
+		}
+
+		cType, ok := contentTypes[path.Ext(filename)]
+		if !ok {
+			cType = "application/octet-stream"
+		}
+
+		w.Header().Set("content-type", cType)
+		_, err = w.Write(data)
+		if err != nil {
+			panic(err)
+		}
+	}))
+	client = srv.Client()
+	return srv
 }

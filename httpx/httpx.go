@@ -26,6 +26,9 @@ func IsURL(path string) bool {
 	if u.Scheme == "" {
 		return false
 	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return false
+	}
 	return true
 }
 
@@ -72,6 +75,16 @@ func GetBody(url string, accept string) (io.ReadCloser, error) {
 	return resp.Body, nil
 }
 
+// GetBytes issues a GET request and decodes the response as bytes.
+func GetBytes(url string) ([]byte, error) {
+	body, err := GetBody(url, "*/*")
+	if err != nil {
+		return nil, err
+	}
+	defer body.Close()
+	return io.ReadAll(body)
+}
+
 // GetJSON issues a GET request and decodes the response as JSON.
 func GetJSON[T any](url string) (*T, error) {
 	body, err := GetBody(url, "application/json")
@@ -92,14 +105,4 @@ func GetJSON[T any](url string) (*T, error) {
 	}
 
 	return &val, nil
-}
-
-// GetBytes issues a GET request and decodes the response as bytes.
-func GetBytes(url string) ([]byte, error) {
-	body, err := GetBody(url, "*/*")
-	if err != nil {
-		return nil, err
-	}
-	defer body.Close()
-	return io.ReadAll(body)
 }
