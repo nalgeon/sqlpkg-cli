@@ -257,21 +257,21 @@ func TestPackage_Save(t *testing.T) {
 	}
 }
 
-func TestPackage_Dir(t *testing.T) {
+func TestDir(t *testing.T) {
 	got := Dir("testdata", "nalgeon", "example")
 	if got != filepath.Join("testdata", DirName, "nalgeon", "example") {
 		t.Errorf("Dir: unexpected value %v", got)
 	}
 }
 
-func TestPackage_Path(t *testing.T) {
+func TestPath(t *testing.T) {
 	got := Path("testdata", "nalgeon", "example")
 	if got != filepath.Join("testdata", DirName, "nalgeon", "example", FileName) {
 		t.Errorf("Path: unexpected value %v", got)
 	}
 }
 
-func TestPackage_inferAssetUrl(t *testing.T) {
+func Test_inferAssetUrl(t *testing.T) {
 	tests := []struct{ name, url, want string }{
 		{
 			"github",
