@@ -1,7 +1,6 @@
 package github
 
 import (
-	"fmt"
 	"testing"
 
 	"sqlpkg.org/cli/httpx"
@@ -29,41 +28,36 @@ func TestGetLatestTag(t *testing.T) {
 
 func TestParseRepoUrl(t *testing.T) {
 	type test struct {
-		num         int
+		url         string
 		owner, repo string
 	}
-	valid := map[string]test{
-		"https://github.com/nalgeon/sqlean":    {0, "nalgeon", "sqlean"},
-		"https://github.com/nalgeon/sqlean/":   {1, "nalgeon", "sqlean"},
-		"https://github.com/asg017/sqlite-vss": {2, "asg017", "sqlite-vss"},
+	valid := []test{
+		{"https://github.com/nalgeon/sqlean", "nalgeon", "sqlean"},
+		{"https://github.com/nalgeon/sqlean/", "nalgeon", "sqlean"},
+		{"https://github.com/asg017/sqlite-vss", "asg017", "sqlite-vss"},
 	}
-	for url, test := range valid {
-		name := fmt.Sprintf("valid_%d", test.num)
-		t.Run(name, func(t *testing.T) {
-			owner, repo, err := ParseRepoUrl(url)
-			if err != nil {
-				t.Fatalf("ParseRepoUrl: unexpected error %v", err)
-			}
-			if owner != test.owner {
-				t.Errorf("ParseRepoUrl: unexpected owner %v", test.owner)
-			}
-			if repo != test.repo {
-				t.Errorf("ParseRepoUrl: unexpected name %v", test.repo)
-			}
-		})
+	for _, test := range valid {
+		owner, repo, err := ParseRepoUrl(test.url)
+		if err != nil {
+			t.Errorf("ParseRepoUrl(%s): unexpected error %v", test.url, err)
+			continue
+		}
+		if owner != test.owner {
+			t.Errorf("ParseRepoUrl(%s): unexpected owner %v", test.url, test.owner)
+		}
+		if repo != test.repo {
+			t.Errorf("ParseRepoUrl(%s): unexpected name %v", test.url, test.repo)
+		}
 	}
 
 	invalid := []string{
 		"https://github.com/nalgeon",
 		"https://antonz.org",
 	}
-	for idx, url := range invalid {
-		name := fmt.Sprintf("valid_%d", idx)
-		t.Run(name, func(t *testing.T) {
-			_, _, err := ParseRepoUrl(url)
-			if err == nil {
-				t.Fatal("ParseRepoUrl: expected error, got nil")
-			}
-		})
+	for _, url := range invalid {
+		_, _, err := ParseRepoUrl(url)
+		if err == nil {
+			t.Errorf("ParseRepoUrl(%s): expected error, got nil", url)
+		}
 	}
 }
