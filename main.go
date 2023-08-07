@@ -25,7 +25,9 @@ func parseArgs() (command string, args []string) {
 	}
 
 	var isVerbose bool
-	flag.BoolVar(&isVerbose, "v", false, "verbose output")
+	if flag.Lookup("v") == nil {
+		flag.BoolVar(&isVerbose, "v", false, "verbose output")
+	}
 	flag.Parse()
 
 	logx.SetVerbose(isVerbose)

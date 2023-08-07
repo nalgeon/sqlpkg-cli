@@ -4,13 +4,14 @@ import (
 	"testing"
 
 	"sqlpkg.org/cli/cmd"
+	"sqlpkg.org/cli/logx"
 )
 
 func TestInfo(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
+	cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
 	cmd.CopyTestRepo(t, "")
-	mem := cmd.SetupTestLogger()
+	mem := logx.Mock()
 
 	args := []string{"nalgeon/example"}
 	err := Info(args)
@@ -24,6 +25,4 @@ func TestInfo(t *testing.T) {
 	mem.MustHave(t, "https://github.com/nalgeon/sqlite-example")
 	mem.MustHave(t, "license: MIT")
 	mem.MustHave(t, "✓ installed")
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }

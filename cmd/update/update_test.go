@@ -13,11 +13,11 @@ import (
 )
 
 func TestUpdate(t *testing.T) {
-	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
 	cmd.CopyTestRepo(t, "success")
 
-	mem := cmd.SetupTestLogger()
+	mem := logx.Mock()
 
 	args := []string{"nalgeon/example"}
 	err := Update(args)
@@ -27,16 +27,14 @@ func TestUpdate(t *testing.T) {
 
 	validateLog(t, mem)
 	validatePackage(t, repoDir, lockPath, "nalgeon", "example")
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func TestUpdateAll(t *testing.T) {
-	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
 	cmd.CopyTestRepo(t, "success")
 
-	mem := cmd.SetupTestLogger()
+	mem := logx.Mock()
 
 	args := []string{}
 	err := UpdateAll(args)
@@ -47,16 +45,14 @@ func TestUpdateAll(t *testing.T) {
 	validateLog(t, mem)
 	mem.MustHave(t, "updated 1 packages")
 	validatePackage(t, repoDir, lockPath, "nalgeon", "example")
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func TestLatest(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
+	cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
 	cmd.CopyTestRepo(t, "latest")
 
-	mem := cmd.SetupTestLogger()
+	mem := logx.Mock()
 
 	args := []string{"nalgeon/example"}
 	err := Update(args)
@@ -74,16 +70,14 @@ func TestLatest(t *testing.T) {
 	if pkg.Version != "0.1.0" {
 		t.Fatalf("unexpected version: %v", pkg.Version)
 	}
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func TestNoVersion(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
+	cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
 	cmd.CopyTestRepo(t, "version")
 
-	mem := cmd.SetupTestLogger()
+	mem := logx.Mock()
 
 	args := []string{"nalgeon/example"}
 	err := Update(args)
@@ -94,13 +88,11 @@ func TestNoVersion(t *testing.T) {
 	mem.Print()
 	mem.MustHave(t, "added package to the lockfile")
 	mem.MustHave(t, "updated package nalgeon/example")
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func TestInvalidChecksum(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
+	cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
 	cmd.CopyTestRepo(t, "checksum")
 
 	args := []string{"nalgeon/example"}
@@ -111,8 +103,6 @@ func TestInvalidChecksum(t *testing.T) {
 	if !strings.Contains(err.Error(), "asset checksum is invalid") {
 		t.Fatalf("unexpected error: %v", err)
 	}
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func validateLog(t *testing.T, mem *logx.Memory) {

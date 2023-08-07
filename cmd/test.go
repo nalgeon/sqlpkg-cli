@@ -7,17 +7,18 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-
-	"sqlpkg.org/cli/logx"
 )
 
-func SetupTestRepo(t *testing.T) (string, string) {
-	repoDir := filepath.Join(WorkDir, ".sqlpkg")
+// SetupTestRepo returns paths to the .sqlpkg folder and the lockfile
+// as if they reside in the working directory.
+func SetupTestRepo(t *testing.T) (repoDir string, lockPath string) {
+	WorkDir = "."
+	repoDir = filepath.Join(WorkDir, ".sqlpkg")
 	err := os.RemoveAll(repoDir)
 	if err != nil {
 		t.Fatalf("SetupTestRepo: %v", err)
 	}
-	lockPath := filepath.Join(WorkDir, "sqlpkg.lock")
+	lockPath = filepath.Join(WorkDir, "sqlpkg.lock")
 	err = os.RemoveAll(lockPath)
 	if err != nil {
 		t.Fatalf("SetupTestRepo: %v", err)
@@ -25,10 +26,13 @@ func SetupTestRepo(t *testing.T) (string, string) {
 	return repoDir, lockPath
 }
 
-func CopyTestRepo(t *testing.T, name string) {
-	basePath := filepath.Join("testdata", name)
+// CopyTestRepo copies the .sqlpkg folder and the lockfile
+// from the testdata folder to the working directory.
+func CopyTestRepo(t *testing.T, path ...string) {
+	basePath := filepath.Join("testdata", filepath.Join(path...))
 
 	{
+		// copy `.sqlpkg` contents
 		path := filepath.Join(basePath, ".sqlpkg")
 		cmd := []string{"cp", "-r", path, "."}
 		err := exec.Command(cmd[0], cmd[1:]...).Run()
@@ -37,6 +41,7 @@ func CopyTestRepo(t *testing.T, name string) {
 		}
 	}
 	{
+		// copy lockfile
 		path := filepath.Join(basePath, "sqlpkg.lock")
 		cmd := []string{"cp", path, "."}
 		err := exec.Command(cmd[0], cmd[1:]...).Run()
@@ -46,20 +51,18 @@ func CopyTestRepo(t *testing.T, name string) {
 	}
 }
 
-func TeardownTestRepo(t *testing.T, repoDir, lockPath string) {
+// TeardownTestRepo deletes the .sqlpkg folder and the lockfile
+// from the working directory.
+func TeardownTestRepo(t *testing.T) {
+	repoDir := filepath.Join(WorkDir, ".sqlpkg")
 	err := os.RemoveAll(repoDir)
 	if err != nil {
 		t.Fatalf("TeardownTestRepo: %v", err)
 	}
+
+	lockPath := filepath.Join(WorkDir, "sqlpkg.lock")
 	err = os.RemoveAll(lockPath)
 	if err != nil {
 		t.Fatalf("TeardownTestRepo: %v", err)
 	}
-}
-
-func SetupTestLogger() *logx.Memory {
-	memory := logx.NewMemory("log")
-	logx.SetOutput(memory)
-	logx.SetVerbose(true)
-	return memory
 }

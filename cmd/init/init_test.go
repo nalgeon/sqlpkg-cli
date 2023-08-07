@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"sqlpkg.org/cli/cmd"
+	"sqlpkg.org/cli/logx"
 )
 
 func TestInit(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
-	mem := cmd.SetupTestLogger()
+	cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
+	mem := logx.Mock()
 
 	args := []string{}
 	err := Init(args)
@@ -20,14 +21,12 @@ func TestInit(t *testing.T) {
 
 	mem.Print()
 	mem.MustHave(t, "created a local repository")
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func TestAlreadyExists(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
-	cmd.SetupTestLogger()
+	cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
+	logx.Mock()
 
 	args := []string{}
 	_ = Init(args)
@@ -38,6 +37,4 @@ func TestAlreadyExists(t *testing.T) {
 	if !strings.Contains(err.Error(), "already exists") {
 		t.Fatalf("unexpected error: %v", err)
 	}
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }

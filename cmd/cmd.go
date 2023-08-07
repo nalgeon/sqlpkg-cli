@@ -17,30 +17,8 @@ var WorkDir string
 // userHomeDir is the user's home directory.
 var userHomeDir string
 
-// init determines the working directory.
-// It is either the .sqlpkg directory (if present) or ~/.sqlpkg otherwise.
 func init() {
-	if fileio.Exists(spec.DirName) {
-		WorkDir = "."
-		return
-	}
-	var err error
-	userHomeDir, err = os.UserHomeDir()
-	if err != nil {
-		WorkDir = "."
-		return
-	}
-	WorkDir = userHomeDir
-}
-
-// getPathFullName expands an owner-name package pair to a full sqlpkg.json path.
-func GetPathByFullName(fullName string) (string, error) {
-	parts := strings.Split(fullName, "/")
-	if len(parts) != 2 {
-		return "", errors.New("invalid package name")
-	}
-	path := spec.Path(WorkDir, parts[0], parts[1])
-	return path, nil
+	inferWorkDir()
 }
 
 // GetDirByFullName expands an owner-name package pair to a full package dir.
@@ -53,9 +31,35 @@ func GetDirByFullName(fullName string) (string, error) {
 	return path, nil
 }
 
+// GetPathByFullName expands an owner-name package pair to a full sqlpkg.json path.
+func GetPathByFullName(fullName string) (string, error) {
+	parts := strings.Split(fullName, "/")
+	if len(parts) != 2 {
+		return "", errors.New("invalid package name")
+	}
+	path := spec.Path(WorkDir, parts[0], parts[1])
+	return path, nil
+}
+
 // PrintLocalRepo prints information about the local sqlpkg repository.
 func PrintLocalRepo() {
 	if WorkDir == "." {
 		logx.Log("(local repository)")
 	}
+}
+
+// inferWorkDir determines the working directory.
+// It is either the .sqlpkg directory (if present) or ~/.sqlpkg otherwise.
+func inferWorkDir() {
+	if fileio.Exists(spec.DirName) {
+		WorkDir = "."
+		return
+	}
+	var err error
+	userHomeDir, err = os.UserHomeDir()
+	if err != nil {
+		WorkDir = "."
+		return
+	}
+	WorkDir = userHomeDir
 }

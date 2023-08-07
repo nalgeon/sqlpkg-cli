@@ -37,3 +37,12 @@ func Log(message string, args ...any) {
 func Debug(message string, args ...any) {
 	logger.Debug(message, args...)
 }
+
+// Mock creates a new Memory and installs it as the logger output
+// instead of the default one. Should be used for testing purposes only.
+func Mock(path ...string) *Memory {
+	memory := NewMemory("log")
+	SetOutput(memory)
+	SetVerbose(true)
+	return memory
+}

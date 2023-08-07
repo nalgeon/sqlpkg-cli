@@ -39,27 +39,27 @@ func ResolveVersion(pkg *spec.Package) error {
 	return nil
 }
 
-// HasNewVersion checks if the remote package is newer than the local one.
-func HasNewVersion(pkg *spec.Package) bool {
-	oldPath := spec.Path(WorkDir, pkg.Owner, pkg.Name)
-	if !fileio.Exists(oldPath) {
+// HasNewVersion checks if the remote package is newer than the installed one.
+func HasNewVersion(remotePkg *spec.Package) bool {
+	installPath := spec.Path(WorkDir, remotePkg.Owner, remotePkg.Name)
+	if !fileio.Exists(installPath) {
 		return true
 	}
 
-	oldPkg, err := spec.ReadLocal(oldPath)
+	installedPkg, err := spec.ReadLocal(installPath)
 	if err != nil {
 		return true
 	}
-	logx.Debug("local package version = %s", oldPkg.Version)
+	logx.Debug("local package version = %s", installedPkg.Version)
 
-	if oldPkg.Version == "" {
+	if installedPkg.Version == "" {
 		// not explicitly versioned, always assume there is a later version
 		return true
 	}
 
-	if oldPkg.Version == pkg.Version {
+	if installedPkg.Version == remotePkg.Version {
 		return false
 	}
 
-	return semver.Compare(oldPkg.Version, pkg.Version) < 0
+	return semver.Compare(installedPkg.Version, remotePkg.Version) < 0
 }

@@ -1,0 +1,2 @@
+e3de533fdc23e0d953572c2b544ecc2951b890758af0a00b5a42695ae59ee7ac  example-darwin.zip
+6bc24897dde2c7f00cf435055a6853358cb06fcb5a2a789877903ebec0b9298d  example-linux.zip

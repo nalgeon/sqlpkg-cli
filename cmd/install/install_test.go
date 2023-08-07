@@ -8,12 +8,13 @@ import (
 	"sqlpkg.org/cli/cmd"
 	"sqlpkg.org/cli/fileio"
 	"sqlpkg.org/cli/lockfile"
+	"sqlpkg.org/cli/logx"
 )
 
 func TestFull(t *testing.T) {
-	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
-	mem := cmd.SetupTestLogger()
+	defer cmd.TeardownTestRepo(t)
+	mem := logx.Mock()
 
 	args := []string{filepath.Join(cmd.WorkDir, "testdata", "full", "sqlpkg.json")}
 	err := Install(args)
@@ -33,15 +34,13 @@ func TestFull(t *testing.T) {
 	mem.MustHave(t, "installed package nalgeon/example")
 
 	validatePackage(t, repoDir, lockPath, "nalgeon", "example")
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func TestLockfile(t *testing.T) {
-	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
 	cmd.CopyTestRepo(t, "lockfile")
-	mem := cmd.SetupTestLogger()
+	mem := logx.Mock()
 
 	args := []string{}
 	err := InstallAll(args)
@@ -56,14 +55,12 @@ func TestLockfile(t *testing.T) {
 	mem.MustHave(t, "installed package nalgeon/example")
 
 	validatePackage(t, repoDir, lockPath, "nalgeon", "example")
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func TestMinimal(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
-	mem := cmd.SetupTestLogger()
+	cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
+	mem := logx.Mock()
 
 	args := []string{filepath.Join(cmd.WorkDir, "testdata", "minimal", "sqlpkg.json")}
 	err := Install(args)
@@ -79,15 +76,13 @@ func TestMinimal(t *testing.T) {
 	mem.MustHave(t, "not an archive, skipping unpack")
 	mem.MustHave(t, "added package to the lockfile")
 	mem.MustHave(t, "installed package nalgeon/example")
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func TestAlreadyInstalled(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
+	cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
 	cmd.CopyTestRepo(t, "installed")
-	mem := cmd.SetupTestLogger()
+	mem := logx.Mock()
 
 	args := []string{filepath.Join(cmd.WorkDir, "testdata", "installed", "sqlpkg.json")}
 	err := Install(args)
@@ -97,14 +92,12 @@ func TestAlreadyInstalled(t *testing.T) {
 
 	mem.Print()
 	mem.MustHave(t, "already at the latest version")
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func TestInvalidChecksum(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
-	cmd.SetupTestLogger()
+	cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
+	logx.Mock()
 
 	args := []string{filepath.Join(cmd.WorkDir, "testdata", "checksum", "sqlpkg.json")}
 	err := Install(args)
@@ -114,14 +107,12 @@ func TestInvalidChecksum(t *testing.T) {
 	if !strings.Contains(err.Error(), "asset checksum is invalid") {
 		t.Fatalf("unexpected error: %v", err)
 	}
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func TestUnsupportedPlatform(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
-	cmd.SetupTestLogger()
+	cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
+	logx.Mock()
 
 	args := []string{filepath.Join(cmd.WorkDir, "testdata", "unsupported", "sqlpkg.json")}
 	err := Install(args)
@@ -131,14 +122,12 @@ func TestUnsupportedPlatform(t *testing.T) {
 	if !strings.Contains(err.Error(), "unsupported platform") {
 		t.Fatalf("unexpected error: %v", err)
 	}
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func TestUnknown(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
-	cmd.SetupTestLogger()
+	cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
+	logx.Mock()
 
 	args := []string{"sqlite/unknown"}
 	err := Install(args)
@@ -148,8 +137,6 @@ func TestUnknown(t *testing.T) {
 	if !strings.Contains(err.Error(), "failed to read package spec") {
 		t.Fatalf("unexpected error: %v", err)
 	}
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func validatePackage(t *testing.T, repoDir, lockPath, owner, name string) {

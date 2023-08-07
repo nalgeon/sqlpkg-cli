@@ -4,12 +4,13 @@ import (
 	"testing"
 
 	"sqlpkg.org/cli/cmd"
+	"sqlpkg.org/cli/logx"
 )
 
 func TestHelp(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
-	mem := cmd.SetupTestLogger()
+	cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
+	mem := logx.Mock()
 
 	args := []string{}
 	err := Help(args)
@@ -28,6 +29,4 @@ func TestHelp(t *testing.T) {
 	mem.MustHave(t, "which")
 	mem.MustHave(t, "help")
 	mem.MustHave(t, "version")
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }

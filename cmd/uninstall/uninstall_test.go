@@ -12,11 +12,11 @@ import (
 )
 
 func TestUninstall(t *testing.T) {
-	cmd.WorkDir = "."
 	repoDir, lockPath := cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
 	cmd.CopyTestRepo(t, "")
 
-	memory := cmd.SetupTestLogger()
+	memory := logx.Mock()
 
 	args := []string{"nalgeon/example"}
 	err := Uninstall(args)
@@ -26,15 +26,13 @@ func TestUninstall(t *testing.T) {
 
 	validateLog(t, memory)
 	validatePackage(t, repoDir, lockPath, "nalgeon", "example")
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func TestUnknown(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
+	cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
 	cmd.CopyTestRepo(t, "")
-	cmd.SetupTestLogger()
+	logx.Mock()
 
 	args := []string{"sqlite/unknown"}
 	err := Uninstall(args)
@@ -44,8 +42,6 @@ func TestUnknown(t *testing.T) {
 	if !strings.Contains(err.Error(), "package is not installed") {
 		t.Fatalf("unexpected error: %v", err)
 	}
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }
 
 func validateLog(t *testing.T, mem *logx.Memory) {

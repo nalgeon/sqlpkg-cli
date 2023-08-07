@@ -83,8 +83,7 @@ func TestPackage_ExpandVars(t *testing.T) {
 		}
 
 		p.ExpandVars()
-		want := "https://antonz.org/{latest}"
-		if p.Assets.Path.Value != want {
+		if p.Assets.Path.Value != "https://antonz.org/{latest}" {
 			t.Errorf("ExpandVars: unexpected Assets.Path = %v", p.Assets.Path)
 		}
 		if p.Assets.Files["linux-amd64"] != "example-linux-{latest}-x86.zip" {

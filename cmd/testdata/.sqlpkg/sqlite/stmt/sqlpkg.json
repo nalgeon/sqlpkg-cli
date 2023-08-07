@@ -1,0 +1,12 @@
+{
+    "owner": "sqlite",
+    "name": "stmt",
+    "version": "",
+    "assets": {
+        "path": "./testdata",
+        "files": {
+            "darwin-arm64": "stmt-darwin.zip",
+            "linux-amd64": "stmt-linux.zip"
+        }
+    }
+}

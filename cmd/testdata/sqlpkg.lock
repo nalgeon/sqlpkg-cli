@@ -1,0 +1,22 @@
+{
+    "packages": {
+        "nalgeon/example": {
+            "owner": "nalgeon",
+            "name": "example",
+            "version": "0.1.0",
+            "assets": {
+                "path": null,
+                "files": null
+            }
+        },
+        "sqlite/stmt": {
+            "owner": "sqlite",
+            "name": "stmt",
+            "version": "0.21.5",
+            "assets": {
+                "path": null,
+                "files": null
+            }
+        }
+    }
+}

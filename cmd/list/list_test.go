@@ -5,13 +5,14 @@ import (
 
 	"sqlpkg.org/cli/cmd"
 	"sqlpkg.org/cli/lockfile"
+	"sqlpkg.org/cli/logx"
 )
 
 func TestList(t *testing.T) {
-	cmd.WorkDir = "."
-	repoDir, lockPath := cmd.SetupTestRepo(t)
+	_, lockPath := cmd.SetupTestRepo(t)
+	defer cmd.TeardownTestRepo(t)
 	cmd.CopyTestRepo(t, "")
-	mem := cmd.SetupTestLogger()
+	mem := logx.Mock()
 
 	args := []string{}
 	err := List(args)
@@ -36,6 +37,4 @@ func TestList(t *testing.T) {
 	if !lck.Has("sqlite/stmt") {
 		t.Fatal("sqlite/stmt not found in the lockfile")
 	}
-
-	cmd.TeardownTestRepo(t, repoDir, lockPath)
 }

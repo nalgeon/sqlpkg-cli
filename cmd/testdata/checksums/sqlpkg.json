@@ -1,0 +1,12 @@
+{
+    "owner": "nalgeon",
+    "name": "example",
+    "version": "0.2.0",
+    "assets": {
+        "path": "./testdata/checksums",
+        "files": {
+            "darwin-arm64": "example-{version}-darwin.zip",
+            "linux-amd64": "example-{version}-linux.zip"
+        }
+    }
+}
