@@ -190,7 +190,7 @@ It will create an `.sqlpkg` folder in the current directory. After that, all oth
 
 The package spec file describes a particular package so that `sqlpkg` can work with it. It is usually created by the package author, so if you are a `sqlpkg` user, you don't need to worry about that.
 
-If you _are_ a package author, who wants your package to be installable by `sqlpkg`, learn how to create a [spec file](docs/spec-file.md).
+If you _are_ a package author, who wants your package to be installable by `sqlpkg`, learn how to create a [spec file](https://github.com/nalgeon/sqlpkg/blob/main/spec.md).
 
 ## Lockfile
 
