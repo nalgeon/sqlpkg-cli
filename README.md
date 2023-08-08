@@ -6,7 +6,7 @@ It works primarily with the [SQLite package registry](https://sqlpkg.org/), but 
 
 ```
 $ sqlpkg help
-╭────────────────────────────────────────────────╮
+┌────────────────────────────────────────────────┐
 │ sqlpkg is an SQLite package manager.           │
 │ Use it to install or update SQLite extensions. │
 │                                                │
@@ -20,10 +20,10 @@ $ sqlpkg help
 │ update     Update installed packages           │
 │ version    Display version                     │
 │ which      Display path to extension file      │
-╰────────────────────────────────────────────────╯
+└────────────────────────────────────────────────┘
 ```
 
-`sqlpkg` is implemented in Go and has zero dependencies.
+`sqlpkg` is implemented in Go and has zero dependencies (see [Writing a package manager](https://antonz.org/writing-package-manager) for details).
 
 [Download](#downloading-and-installing) •
 [Install packages](#installing-packages) •
