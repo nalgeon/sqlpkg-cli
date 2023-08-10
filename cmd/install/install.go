@@ -13,7 +13,7 @@ const installHelp = "usage: sqlpkg install [package]"
 
 // InstallAll installs all packages from the lockfile.
 func InstallAll(args []string) error {
-	cmd.PrintLocalRepo()
+	cmd.PrintScope()
 
 	lck, err := cmd.ReadLockfile()
 	if err != nil {
@@ -48,7 +48,7 @@ func Install(args []string) error {
 		return errors.New(installHelp)
 	}
 
-	cmd.PrintLocalRepo()
+	cmd.PrintScope()
 
 	path := args[0]
 	err := installPackage(path)

@@ -24,9 +24,9 @@ func Init(args []string) error {
 
 	err := os.Mkdir(spec.DirName, 0755)
 	if err != nil {
-		return fmt.Errorf("failed to create a local repository: %w", err)
+		return fmt.Errorf("failed to create a project scope: %w", err)
 	}
 
-	logx.Log("✓ created a local repository")
+	logx.Log("✓ created a project scope")
 	return nil
 }

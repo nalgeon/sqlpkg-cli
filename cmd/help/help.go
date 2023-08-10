@@ -14,7 +14,7 @@ const help = "usage: sqlpkg help"
 var commandsHelp = map[string]string{
 	"help":      "Display help",
 	"info":      "Display package information",
-	"init":      "Create local repository",
+	"init":      "Init project scope",
 	"install":   "Install packages",
 	"list":      "List installed packages",
 	"uninstall": "Uninstall package",

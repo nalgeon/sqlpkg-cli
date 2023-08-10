@@ -71,7 +71,7 @@ func TestGetDirByFullName(t *testing.T) {
 	})
 }
 
-func TestPrintLocalRepo(t *testing.T) {
+func TestPrintScope(t *testing.T) {
 	mem := logx.Mock()
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -80,19 +80,19 @@ func TestPrintLocalRepo(t *testing.T) {
 
 	t.Run("home dir", func(t *testing.T) {
 		WorkDir = home
-		PrintLocalRepo()
+		PrintScope()
 		if len(mem.Lines) != 0 {
-			t.Fatalf("PrintLocalRepo: unexpected line count %v", len(mem.Lines))
+			t.Fatalf("PrintScope: unexpected line count %v", len(mem.Lines))
 		}
 	})
 	t.Run("project dir", func(t *testing.T) {
 		WorkDir = "."
-		PrintLocalRepo()
+		PrintScope()
 		if len(mem.Lines) != 1 {
-			t.Fatalf("PrintLocalRepo: unexpected line count %v", len(mem.Lines))
+			t.Fatalf("PrintScope: unexpected line count %v", len(mem.Lines))
 		}
-		if !mem.Has("(local repository)") {
-			t.Errorf("PrintLocalRepo: unexpected output %v", mem.Lines)
+		if !mem.Has("(project scope)") {
+			t.Errorf("PrintScope: unexpected output %v", mem.Lines)
 		}
 	})
 }

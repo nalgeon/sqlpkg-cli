@@ -41,10 +41,10 @@ func GetPathByFullName(fullName string) (string, error) {
 	return path, nil
 }
 
-// PrintLocalRepo prints information about the local sqlpkg repository.
-func PrintLocalRepo() {
+// PrintScope prints information about the current scope (project/global).
+func PrintScope() {
 	if WorkDir == "." {
-		logx.Log("(local repository)")
+		logx.Log("(project scope)")
 	}
 }
 

@@ -93,7 +93,7 @@ func sortPackages(packages []*spec.Package) {
 
 // printPackages prints packages.
 func printPackages(packages []*spec.Package) {
-	cmd.PrintLocalRepo()
+	cmd.PrintScope()
 	if len(packages) == 0 {
 		logx.Log("no packages installed")
 		return

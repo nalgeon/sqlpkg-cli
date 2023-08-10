@@ -20,7 +20,7 @@ func TestInit(t *testing.T) {
 	}
 
 	mem.Print()
-	mem.MustHave(t, "created a local repository")
+	mem.MustHave(t, "created a project scope")
 }
 
 func TestAlreadyExists(t *testing.T) {

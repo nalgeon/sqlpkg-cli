@@ -19,7 +19,7 @@ func UpdateAll(args []string) error {
 		return errors.New(updateHelp)
 	}
 
-	cmd.PrintLocalRepo()
+	cmd.PrintScope()
 
 	pattern := filepath.Join(cmd.WorkDir, spec.DirName, "*", "*", spec.FileName)
 	paths, _ := filepath.Glob(pattern)

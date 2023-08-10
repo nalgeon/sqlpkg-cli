@@ -13,7 +13,7 @@ $ sqlpkg help
 │ Commands:                                      │
 │ help       Display help                        │
 │ info       Display package information         │
-│ init       Create local repository             │
+│ init       Init project scope                  │
 │ install    Install packages                    │
 │ list       List installed packages             │
 │ uninstall  Uninstall package                   │
@@ -174,9 +174,9 @@ sqlpkg version
 
 Displays `sqlpkg` version number.
 
-## Using a local repository
+## Project vs. global scope
 
-By default, `sqlpkg` installs all extensions in the home folder. If you are writing a Python (JavaScript, Go, ...) application — you may prefer to put them in the project folder (like virtual environment in Python or `node_modules` in JavaScript).
+By default, `sqlpkg` installs all extensions in the home folder (global scope). If you are writing a Python (JavaScript, Go, ...) application — you may prefer to put them in the project folder (project scope, like virtual environment in Python or `node_modules` in JavaScript).
 
 To do that, run the `init` command:
 
@@ -194,7 +194,7 @@ If you _are_ a package author, who wants your package to be installable by `sqlp
 
 ## Lockfile
 
-`sqlpkg` stores information about the installed packages in a special file (the _lockfile_) — `sqlpkg.lock`. If you're using a local repository, it's a good idea to commit `sqlpkg.lock` along with other code. This way, when you check out the code on another machine, you can install all the packages at once.
+`sqlpkg` stores information about the installed packages in a special file (the _lockfile_) — `sqlpkg.lock`. If you're using a project scope, it's a good idea to commit `sqlpkg.lock` along with other code. This way, when you check out the code on another machine, you can install all the packages at once.
 
 To install the packages listed in the lockfile, simply run `install` with no arguments:
 

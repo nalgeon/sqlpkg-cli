@@ -18,7 +18,7 @@ func Uninstall(args []string) error {
 		return errors.New(uninstallHelp)
 	}
 
-	cmd.PrintLocalRepo()
+	cmd.PrintScope()
 
 	fullName := args[0]
 	logx.Log("> uninstalling %s...", fullName)
