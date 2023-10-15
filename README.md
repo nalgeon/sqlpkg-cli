@@ -25,14 +25,30 @@ $ sqlpkg help
 
 `sqlpkg` is implemented in Go and has zero dependencies (see [Writing a package manager](https://antonz.org/writing-package-manager) for details).
 
-[Download](#downloading-and-installing) •
+[Download](#download-and-install-preferred-method) •
 [Install packages](#installing-packages) •
 [Package location](#package-location) •
 [Load into SQLite](#loading-installed-extensions-in-sqlite) •
 [Other commands](#other-commands) •
 [Lockfile](#lockfile)
 
-## Downloading and installing
+## Download and install (preferred method)
+
+Linux/macOS:
+
+```sh
+curl -sS https://beta.webi.sh/sqlpkg | sh
+```
+
+Windows:
+
+```sh
+curl.exe https://beta.webi.ms/sqlpkg | powershell
+```
+
+To update or switch versions, run `webi sqlpkg@stable` (or `@v1.1`, `@beta`, etc).
+
+## Download and install (manual)
 
 `sqlpkg` is a binary executable file (`sqlpkg.exe` on Windows, `sqlpkg` on Linux/macOS). Download it from the link below, unpack and put somewhere in your `PATH` ([what's that?](https://gist.github.com/nex3/c395b2f8fd4b02068be37c961301caa7)), so you can run it from anyhwere on your computer.
 
