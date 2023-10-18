@@ -37,13 +37,13 @@ $ sqlpkg help
 Linux/macOS:
 
 ```sh
-curl -sS https://beta.webi.sh/sqlpkg | sh
+curl -sS https://webi.sh/sqlpkg | sh
 ```
 
 Windows:
 
 ```sh
-curl.exe https://beta.webi.ms/sqlpkg | powershell
+curl.exe https://webi.ms/sqlpkg | powershell
 ```
 
 To update or switch versions, run `webi sqlpkg@stable` (or `@v1.1`, `@beta`, etc).
