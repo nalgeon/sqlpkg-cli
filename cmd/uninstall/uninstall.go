@@ -10,7 +10,7 @@ import (
 	"sqlpkg.org/cli/logx"
 )
 
-const uninstallHelp = "usage: sqlpkg uninstall package"
+const uninstallHelp = "usage: sqlpkg uninstall <package>"
 
 // Uninstall deletes the specified package.
 func Uninstall(args []string) error {

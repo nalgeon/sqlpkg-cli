@@ -29,13 +29,16 @@ func Help(args []string) error {
 		return errors.New(help)
 	}
 
-	logx.Log(`sqlpkg is an SQLite package manager.
-Use it to install or update SQLite extensions.`)
-	logx.Log("\nCommands:")
+	logx.Log("sqlpkg is a package manager for installing and updating SQLite extensions.\n")
+	logx.Log("USAGE")
+	logx.Log("  sqlpkg [global-options] <command> [arguments]\n")
+	logx.Log("GLOBAL OPTIONS")
+	logx.Log("  -v  verbose output\n")
+	logx.Log("COMMANDS")
 
 	w := tabwriter.NewWriter(logx.Output(), 0, 4, 0, ' ', 0)
 	for _, cmd := range sortedCommands() {
-		fmt.Fprintln(w, cmd, "\t", commandsHelp[cmd])
+		fmt.Fprintln(w, "  ", cmd, "\t", commandsHelp[cmd])
 	}
 	w.Flush()
 

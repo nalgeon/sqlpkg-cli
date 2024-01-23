@@ -10,7 +10,7 @@ import (
 	"sqlpkg.org/cli/spec"
 )
 
-const infoHelp = "usage: sqlpkg info package"
+const infoHelp = "usage: sqlpkg info <package>"
 
 // Info prints information about the package (installed or not).
 func Info(args []string) error {

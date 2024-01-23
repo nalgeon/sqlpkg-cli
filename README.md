@@ -5,22 +5,24 @@
 It works primarily with the [SQLite package registry](https://sqlpkg.org/), but is not limited to it. You can install SQLite extensions from GitHub repositories or other websites. All you need is a package spec file (more on that later).
 
 ```
-$ sqlpkg help
-┌────────────────────────────────────────────────┐
-│ sqlpkg is an SQLite package manager.           │
-│ Use it to install or update SQLite extensions. │
-│                                                │
-│ Commands:                                      │
-│ help       Display help                        │
-│ info       Display package information         │
-│ init       Init project scope                  │
-│ install    Install packages                    │
-│ list       List installed packages             │
-│ uninstall  Uninstall package                   │
-│ update     Update installed packages           │
-│ version    Display version                     │
-│ which      Display path to extension file      │
-└────────────────────────────────────────────────┘
+sqlpkg is a package manager for installing and updating SQLite extensions.
+
+USAGE
+  sqlpkg [global-options] <command> [arguments]
+
+GLOBAL OPTIONS
+  -v  verbose output
+
+COMMANDS
+   help       Display help
+   info       Display package information
+   init       Init project scope
+   install    Install packages
+   list       List installed packages
+   uninstall  Uninstall package
+   update     Update installed packages
+   version    Display version
+   which      Display path to extension file
 ```
 
 `sqlpkg` is implemented in Go and has zero dependencies (see [Writing a package manager](https://antonz.org/writing-package-manager) for details).

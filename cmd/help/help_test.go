@@ -19,7 +19,7 @@ func TestHelp(t *testing.T) {
 	}
 
 	mem.Print()
-	mem.MustHave(t, "sqlpkg is an SQLite package manager")
+	mem.MustHave(t, "sqlpkg is a package manager")
 	mem.MustHave(t, "install")
 	mem.MustHave(t, "uninstall")
 	mem.MustHave(t, "update")

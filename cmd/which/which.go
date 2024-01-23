@@ -12,7 +12,7 @@ import (
 	"sqlpkg.org/cli/spec"
 )
 
-const help = "usage: sqlpkg which package"
+const help = "usage: sqlpkg which <package>"
 
 // maps the OS name to the file extension
 var fileExt = map[string]string{
