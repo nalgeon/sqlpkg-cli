@@ -81,7 +81,7 @@ sqlpkg install github.com/nalgeon/sqlean
 Install a package from a spec file somewhere on the Internet:
 
 ```
-sqlpkg install https://antonz.org/downloads/stats.json
+sqlpkg install https://antonz.org/assets/stats.json
 ```
 
 Install a package from a local spec file:
