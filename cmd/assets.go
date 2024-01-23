@@ -14,6 +14,14 @@ import (
 	"sqlpkg.org/cli/spec"
 )
 
+// AssetTempDirName is the name of the temporary directory for downloading assets.
+const AssetTempDirName = ".tmp"
+
+// AssetTempDir returns the temporary directory for downloading assets.
+func AssetTempDir() string {
+	return filepath.Join(WorkDir, spec.DirName, AssetTempDirName)
+}
+
 // BuildAssetPath constructs an URL to download package asset.
 func BuildAssetPath(pkg *spec.Package) (*spec.AssetPath, error) {
 	logx.Debug("checking remote asset for platform %s-%s", runtime.GOOS, runtime.GOARCH)
@@ -34,7 +42,7 @@ func BuildAssetPath(pkg *spec.Package) (*spec.AssetPath, error) {
 // DownloadAsset downloads package asset.
 func DownloadAsset(pkg *spec.Package, assetPath *spec.AssetPath) (*assets.Asset, error) {
 	logx.Debug("downloading %s", assetPath)
-	dir := spec.Dir(os.TempDir(), pkg.Owner, pkg.Name)
+	dir := filepath.Join(AssetTempDir(), pkg.Owner, pkg.Name)
 	err := fileio.CreateDir(dir)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create temp directory: %w", err)

@@ -14,6 +14,17 @@ import (
 	"sqlpkg.org/cli/spec"
 )
 
+func TestAssetTempDir(t *testing.T) {
+	defer os.RemoveAll(AssetTempDir())
+	t.Run("dir name", func(t *testing.T) {
+		dir := AssetTempDir()
+		wantDir := filepath.Join(WorkDir, ".sqlpkg/.tmp")
+		if dir != wantDir {
+			t.Errorf("AssetTempDir: unexpected value %v", dir)
+		}
+	})
+}
+
 func TestBuildAssetPath(t *testing.T) {
 	httpx.Mock()
 	t.Run("exists", func(t *testing.T) {
@@ -54,6 +65,7 @@ func TestBuildAssetPath(t *testing.T) {
 
 func TestDownloadAsset(t *testing.T) {
 	httpx.Mock()
+	defer os.RemoveAll(AssetTempDir())
 	t.Run("http", func(t *testing.T) {
 		pkg := &spec.Package{
 			Owner: "nalgeon", Name: "example", Version: "0.1.0",
@@ -76,6 +88,10 @@ func TestDownloadAsset(t *testing.T) {
 		}
 		if asset.Name != fmt.Sprintf("example-%s.zip", runtime.GOOS) {
 			t.Errorf("DownloadAsset: unexpected Name %v", asset.Name)
+		}
+		wantDir := filepath.Join(WorkDir, ".sqlpkg/.tmp/nalgeon/example")
+		if asset.Dir() != wantDir {
+			t.Errorf("DownloadAsset: unexpected Dir %v", asset.Dir())
 		}
 		if filepath.Base(asset.Path) != asset.Name {
 			t.Errorf("DownloadAsset: unexpected Path %v", asset.Path)
@@ -109,6 +125,10 @@ func TestDownloadAsset(t *testing.T) {
 		asset, err := DownloadAsset(pkg, path)
 		if err != nil {
 			t.Fatalf("DownloadAsset: unexpected error %v", err)
+		}
+		wantDir := filepath.Join(WorkDir, ".sqlpkg/.tmp/nalgeon/example")
+		if asset.Dir() != wantDir {
+			t.Errorf("DownloadAsset: unexpected Dir %v", asset.Dir())
 		}
 		if asset.Name != fmt.Sprintf("example-%s.zip", runtime.GOOS) {
 			t.Errorf("DownloadAsset: unexpected Name %v", asset.Name)
