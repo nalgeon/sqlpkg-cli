@@ -72,6 +72,8 @@ func Update(args []string) error {
 		return errors.New(updateHelp)
 	}
 
+	cmd.PrintScope()
+
 	fullName := args[0]
 	path, err := cmd.GetPathByFullName(fullName)
 	if err != nil {
