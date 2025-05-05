@@ -105,6 +105,9 @@ func Unpack(path, pattern string) (int, error) {
 	if strings.HasSuffix(path, ".tar.gz") || strings.HasSuffix(path, ".tgz") {
 		return unpackTarGz(path, pattern, dir)
 	}
+	if strings.HasSuffix(path, ".gz") {
+		return unpackGzip(path, dir)
+	}
 	return 0, nil
 }
 
@@ -152,12 +155,44 @@ func unpackZip(path, pattern, dir string) (int, error) {
 	return count, nil
 }
 
+// unpackGzip unpackes a gzip archive.
+func unpackGzip(path, dir string) (int, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return 0, err
+	}
+	defer file.Close()
+
+	gzip, err := gzip.NewReader(file)
+	if err != nil {
+		return 0, err
+	}
+	defer gzip.Close()
+
+	// Determine the output filename by removing the .gz extension.
+	dstFilename := strings.TrimSuffix(filepath.Base(path), ".gz")
+	dstPath := filepath.Join(dir, dstFilename)
+	dstFile, err := os.Create(dstPath)
+	if err != nil {
+		return 0, err
+	}
+	defer dstFile.Close()
+
+	_, err = io.Copy(dstFile, gzip)
+	if err != nil {
+		return 0, err
+	}
+
+	return 1, nil
+}
+
 // unpackTarGz unpackes a .tar.gz archive.
 func unpackTarGz(path, pattern, dir string) (int, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return 0, err
 	}
+	defer file.Close()
 
 	gzip, err := gzip.NewReader(file)
 	if err != nil {

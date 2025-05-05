@@ -214,4 +214,23 @@ func TestUnpack(t *testing.T) {
 			t.Error("Unpack: unexpected example.txt")
 		}
 	})
+	t.Run("gunzip", func(t *testing.T) {
+		path := filepath.Join("testdata", "example.so.gz")
+		dir := t.TempDir()
+		asset, err := Copy(dir, path)
+		if err != nil {
+			t.Fatalf("Copy: unexpected error %v", err)
+		}
+
+		count, err := Unpack(asset.Path, "")
+		if err != nil {
+			t.Fatalf("Unpack: unexpected error %v", err)
+		}
+		if count != 1 {
+			t.Errorf("Unpack: unexpected count %v", count)
+		}
+		if !fileio.Exists(filepath.Join(dir, "example.so")) {
+			t.Error("Unpack: missing example.so")
+		}
+	})
 }
