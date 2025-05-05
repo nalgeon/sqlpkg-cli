@@ -1,2 +1,22 @@
 builds:
     - binary: sqlpkg
+      env:
+          - CGO_ENABLED=0
+      goos:
+          - linux
+          - windows
+          - darwin
+      goarch:
+          - amd64
+          - arm64
+brews:
+    - name: sqlpkg
+      homepage: "https://github.com/nalgeon/sqlpkg-cli"
+      description: "SQLite package manager"
+      license: "MIT"
+      repository:
+          owner: nalgeon
+          name: sqlpkg-cli
+      commit_author:
+          name: nalgeon
+          email: m@antonz.org
