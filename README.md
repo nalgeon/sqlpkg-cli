@@ -2,7 +2,7 @@
 
 `sqlpkg` manages SQLite extensions, just like `pip` does with Python packages or `brew` does with macOS programs.
 
-It works primarily with the [SQLite package registry](https://sqlpkg.org/), but is not limited to it. You can install SQLite extensions from GitHub repositories or other websites. All you need is a package spec file (more on that later).
+It works primarily with the [SQLite extension hub](https://sqlpkg.org/), but is not limited to it. You can install SQLite extensions from GitHub repositories or other websites. All you need is a package spec file (more on that later).
 
 ```
 sqlpkg is a package manager for installing and updating SQLite extensions.
@@ -222,10 +222,4 @@ sqlpkg install
 
 `sqlpkg` will detect the lockfile (in the current folder or the user's home folder) and install all the packages listed in it.
 
-──
-
-That's all for now. Now try some packages!
-
-[⬇️ Download](https://github.com/nalgeon/sqlpkg-cli/releases/latest) •
-[✨ Explore](https://sqlpkg.org/) •
-[🚀 Follow](https://antonz.org/subscribe/)
+That's it!
